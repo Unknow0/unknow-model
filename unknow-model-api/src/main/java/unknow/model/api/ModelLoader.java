@@ -18,6 +18,15 @@ import java.util.regex.Pattern;
 public abstract class ModelLoader {
 	private static final TypeModel[] EMPTY = {};
 
+	private static final Map<String, TypeModel> BUILDIN = new HashMap<>();
+
+	static {
+		for (PrimitiveModel t : PrimitiveModel.PRIMITIVES) {
+			BUILDIN.put(t.toString(), t);
+			BUILDIN.put(t.name(), t);
+		}
+	}
+
 	protected static final Pattern CLAZZ = Pattern.compile("(.+?)(?:<(.*?)>)?");
 	protected static final Pattern CLAZZ_LIST = Pattern.compile("(.+?(?:<.*?>)?)(?:,|$)");
 
@@ -63,6 +72,10 @@ public abstract class ModelLoader {
 	}
 
 	private final TypeModel create(String cl, List<TypeParamModel> parameters) {
+		TypeModel b = BUILDIN.get(cl);
+		if (b != null)
+			return b;
+
 		if (cl.endsWith("[]"))
 			return new ArrayModel(get(cl.substring(0, cl.length() - 2), parameters));
 		if (cl.equals("?"))
