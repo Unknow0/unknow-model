@@ -1,0 +1,75 @@
+package unknow.model.ast;
+
+import java.util.Collection;
+import java.util.stream.Collectors;
+
+import com.github.javaparser.ast.body.Parameter;
+
+import unknow.model.api.AnnotationModel;
+import unknow.model.api.ClassModel;
+import unknow.model.api.ModelLoader;
+import unknow.model.api.ParamModel;
+import unknow.model.api.TypeModel;
+import unknow.model.api.WithParent;
+
+/**
+ * @author unknow
+ * @param <T> parent
+ */
+public class AstParam<T extends WithParent<ClassModel>> implements ParamModel<T> {
+	private final ModelLoader loader;
+	private final T m;
+	private final Parameter p;
+	private final int index;
+	private Collection<AnnotationModel> annotations;
+	private TypeModel type;
+
+	/**
+	 * create new AstParam
+	 * 
+	 * @param loader the loader
+	 * @param m the owner
+	 * @param p the parameter
+	 * @param index the param index
+	 */
+	public AstParam(ModelLoader loader, T m, Parameter p, int index) {
+		this.loader = loader;
+		this.m = m;
+		this.p = p;
+		this.index = index;
+	}
+
+	@Override
+	public int index() {
+		return index;
+	}
+
+	@Override
+	public Collection<AnnotationModel> annotations() {
+		if (annotations == null)
+			annotations = p.getAnnotations().stream().map(a -> new AstAnnotation(loader, a)).collect(Collectors.toList());
+		return annotations;
+	}
+
+	@Override
+	public String name() {
+		return p.getNameAsString();
+	}
+
+	@Override
+	public T parent() {
+		return m;
+	}
+
+	@Override
+	public TypeModel type() {
+		if (type == null)
+			type = loader.get(p.getType().resolve().describe(), m.parent().parameters());
+		return type;
+	}
+
+	@Override
+	public String toString() {
+		return p.toString();
+	}
+}

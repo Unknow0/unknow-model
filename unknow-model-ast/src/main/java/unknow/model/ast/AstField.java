@@ -1,0 +1,76 @@
+package unknow.model.ast;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import com.github.javaparser.ast.body.FieldDeclaration;
+import com.github.javaparser.ast.body.VariableDeclarator;
+
+import unknow.model.api.AnnotationModel;
+import unknow.model.api.ClassModel;
+import unknow.model.api.FieldModel;
+import unknow.model.api.ModelLoader;
+import unknow.model.api.TypeModel;
+
+/**
+ * @author unknow
+ */
+public class AstField implements FieldModel, AstMod<FieldDeclaration> {
+	private final ModelLoader loader;
+	private final ClassModel cl;
+	private final FieldDeclaration f;
+	private final VariableDeclarator v;
+	private List<AnnotationModel> annotations;
+	private TypeModel type;
+
+	/**
+	 * create new AstField
+	 * 
+	 * @param loader the loader
+	 * @param cl the class owning the field
+	 * @param f the field declaration (can contains multiple variable)
+	 * @param v the variable
+	 */
+	public AstField(ModelLoader loader, ClassModel cl, FieldDeclaration f, VariableDeclarator v) {
+		this.loader = loader;
+		this.cl = cl;
+		this.f = f;
+		this.v = v;
+	}
+
+	@Override
+	public Collection<AnnotationModel> annotations() {
+		if (annotations == null)
+			annotations = f.getAnnotations().stream().map(a -> new AstAnnotation(loader, a)).collect(Collectors.toList());
+		return annotations;
+	}
+
+	@Override
+	public FieldDeclaration object() {
+		return f;
+	}
+
+	@Override
+	public String name() {
+		return v.getNameAsString();
+	}
+
+	@Override
+	public ClassModel parent() {
+		return cl;
+	}
+
+	@Override
+	public String toString() {
+		return type() + " " + name();
+	}
+
+	@Override
+	public TypeModel type() {
+		if (type == null)
+			type = loader.get(v.getType().resolve().describe(), cl.parameters());
+		return type;
+	}
+
+}

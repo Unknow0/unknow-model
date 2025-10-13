@@ -1,0 +1,43 @@
+/**
+ * 
+ */
+package unknow.model.api;
+
+import java.util.List;
+import java.util.Optional;
+
+/**
+ * @author unknow
+ */
+public interface EnumModel extends ClassModel {
+
+	@Override
+	default boolean isEnum() {
+		return true;
+	}
+
+	/**
+	 * @return declared enum entries
+	 */
+	List<EnumConstant> entries();
+
+	/**
+	 * @param name name to find
+	 * @return enum constant with name
+	 */
+	default Optional<EnumConstant> entry(String name) {
+		return entries().stream().filter(e -> e.name().equals(name)).findAny();
+	}
+
+	/**
+	 * an enum constant
+	 * 
+	 * @author unknow
+	 */
+	public interface EnumConstant extends WithAnnotation {
+		/**
+		 * @return enum constant name
+		 */
+		String name();
+	}
+}
