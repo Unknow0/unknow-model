@@ -49,6 +49,11 @@ public abstract class AstBaseClass<T extends TypeDeclaration<?>> implements Clas
 	}
 
 	@Override
+	public boolean isInterface() {
+		return false;
+	}
+
+	@Override
 	public String name() {
 		if (name == null)
 			name = getBinaryName(c);

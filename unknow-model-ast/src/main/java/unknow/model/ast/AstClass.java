@@ -36,6 +36,11 @@ public class AstClass extends AstBaseClass<ClassOrInterfaceDeclaration> {
 	}
 
 	@Override
+	public boolean isInterface() {
+		return c.isInterface();
+	}
+
+	@Override
 	public ClassModel superType() {
 		if (c.isInterface())
 			return null;

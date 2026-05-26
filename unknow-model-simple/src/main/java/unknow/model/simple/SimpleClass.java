@@ -18,13 +18,19 @@ import unknow.model.jvm.JvmModelLoader;
 public class SimpleClass extends SimpleWithAnnotation implements ClassModel, JvmMod {
 	private final String name;
 	private final int mod;
+	private final boolean isInterface;
 	private final List<FieldModel> fields = new ArrayList<>();
 	private final List<MethodModel> methods = new ArrayList<>();
 	private SimplePackage parent;
 
 	public SimpleClass(String name, int mod) {
+		this(name, mod, false);
+	}
+
+	public SimpleClass(String name, int mod, boolean isInterface) {
 		this.name = name;
 		this.mod = mod;
+		this.isInterface = isInterface;
 		int i = name.lastIndexOf(".");
 		this.parent = new SimplePackage(i < 0 ? "" : name.substring(i + 1));
 	}
@@ -48,6 +54,11 @@ public class SimpleClass extends SimpleWithAnnotation implements ClassModel, Jvm
 	@Override
 	public int mod() {
 		return mod;
+	}
+
+	@Override
+	public boolean isInterface() {
+		return isInterface;
 	}
 
 	@Override

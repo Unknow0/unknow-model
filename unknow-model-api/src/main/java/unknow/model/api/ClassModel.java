@@ -34,6 +34,11 @@ public interface ClassModel extends TypeModel, WithMod {
 	 * @return the declared constructors
 	 */
 	Collection<ConstructorModel> constructors();
+	
+	/**
+	 * @return true if this class is an interface
+	 */
+	boolean isInterface();
 
 	/**
 	 * @param params the constructor params
