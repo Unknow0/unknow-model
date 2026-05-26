@@ -66,6 +66,11 @@ public class JvmClass implements ClassModel, JvmMod {
 	}
 
 	@Override
+	public boolean isInterface() {
+		return cl.isInterface();
+	}
+
+	@Override
 	public Collection<AnnotationModel> annotations() {
 		if (annotations == null)
 			annotations = Arrays.stream(cl.getAnnotations()).map(a -> new JvmAnnotation(loader, a)).collect(Collectors.toList());

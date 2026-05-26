@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.github.javaparser.ast.Modifier.Keyword;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.Parameter;
 
@@ -51,6 +52,13 @@ public class AstMethod implements MethodModel, AstMod<MethodDeclaration> {
 			annotations = m.getAnnotations().stream().map(a -> new AstAnnotation(loader, a)).collect(Collectors.toList());
 		}
 		return annotations;
+	}
+
+	@Override
+	public boolean isPublic() {
+		if (parent.isInterface())
+			return true;
+		return object().getModifiers().stream().anyMatch(m -> m.getKeyword() == Keyword.PUBLIC);
 	}
 
 	@Override
