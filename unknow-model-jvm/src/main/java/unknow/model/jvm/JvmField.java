@@ -5,22 +5,22 @@ package unknow.model.jvm;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
-import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import unknow.model.api.AnnotationModel;
+import unknow.model.api.AnnotationValue;
 import unknow.model.api.ClassModel;
 import unknow.model.api.FieldModel;
+import unknow.model.api.ModelLoader;
 import unknow.model.api.TypeModel;
+import unknow.model.api.impl.AbstractFieldModel;
 
 /**
  * @author unknow
  */
-public class JvmField implements FieldModel, JvmMod {
-	private final JvmModelLoader loader;
-	private final ClassModel cl;
+public class JvmField extends AbstractFieldModel implements FieldModel, JvmMod {
 	private final Field f;
-	private Collection<AnnotationModel> annotations;
 
 	/**
 	 * create new JvmField
@@ -29,21 +29,14 @@ public class JvmField implements FieldModel, JvmMod {
 	 * @param cl the class owning the field
 	 * @param f the field
 	 */
-	public JvmField(JvmModelLoader loader, ClassModel cl, Field f) {
-		this.loader = loader;
-		this.cl = cl;
+	public JvmField(ModelLoader loader, ClassModel cl, Field f) {
+		super(loader, cl);
 		this.f = f;
 	}
 
-	public Field field() {
-		return f;
-	}
-
 	@Override
-	public Collection<AnnotationModel> annotations() {
-		if (annotations == null)
-			annotations = Arrays.stream(f.getAnnotations()).map(a -> new JvmAnnotation(loader, a)).collect(Collectors.toList());
-		return annotations;
+	protected List<AnnotationModel> loadAnnotations(ModelLoader loader) {
+		return Arrays.stream(f.getAnnotations()).map(a -> new JvmAnnotation(loader, a)).collect(Collectors.toList());
 	}
 
 	@Override
@@ -57,17 +50,16 @@ public class JvmField implements FieldModel, JvmMod {
 	}
 
 	@Override
-	public String toString() {
-		return type() + " " + name();
+	protected TypeModel loadType(ModelLoader loader) {
+		return loader.get(f.getGenericType().getTypeName(), parent().parameters());
 	}
 
 	@Override
-	public ClassModel parent() {
-		return cl;
-	}
-
-	@Override
-	public TypeModel type() {
-		return loader.get(f.getGenericType().getTypeName(), cl.parameters());
+	public AnnotationValue value(ModelLoader loader) {
+		try {
+			return JvmAnnotation.getValue(loader, f.get(null));
+		} catch (IllegalArgumentException | IllegalAccessException e) {
+			throw new IllegalArgumentException(e);
+		}
 	}
 }

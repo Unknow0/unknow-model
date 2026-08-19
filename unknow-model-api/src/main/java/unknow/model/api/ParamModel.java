@@ -4,10 +4,10 @@
 package unknow.model.api;
 
 /**
+ * method parameter
  * @author unknow
- * @param <T> owner model
  */
-public interface ParamModel<T extends WithParent<ClassModel>> extends WithAnnotation, WithType, WithName, WithParent<T> {
+public interface ParamModel extends WithAnnotation, WithType, WithName, WithParent<MethodModel> {
 	/**
 	 * @return index of the param
 	 */

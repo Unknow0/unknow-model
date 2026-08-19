@@ -24,7 +24,7 @@ public abstract class AbstractTestLoader {
 		assertEquals(GString.class.getName(), slist.name());
 		assertTrue(col.isAssignableFrom(slist));
 		assertEquals("java.lang.String", slist.superType().parameter(0).type().name());
-		assertEquals("java.lang.String", slist.superType().field("a").type().name());
+		assertEquals("java.lang.String", slist.superType().field("a").get().type().name());
 
 		ClassModel ilist = loader.get(GInteger.class.getName()).asClass();
 		assertTrue(col.isAssignableFrom(ilist));

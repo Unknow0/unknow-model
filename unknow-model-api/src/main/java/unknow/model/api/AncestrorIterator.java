@@ -37,7 +37,7 @@ public class AncestrorIterator implements Iterator<ClassModel> {
 		this.queue = new LinkedBlockingQueue<>();
 		this.queue.add(clazz);
 		this.saw = new HashSet<>();
-		this.saw.add(clazz.toString());
+		this.saw.add(clazz.name());
 	}
 
 	@Override
@@ -51,11 +51,11 @@ public class AncestrorIterator implements Iterator<ClassModel> {
 			throw new NoSuchElementException();
 		ClassModel poll = queue.poll();
 		ClassModel s = poll.superType();
-		if (s != null && !"java.lang.Object".equals(s.name()) && saw.add(s.toString()))
+		if (s != null && !"java.lang.Object".equals(s.name()) && saw.add(s.name()))
 			queue.add(s);
 
 		for (ClassModel i : poll.interfaces()) {
-			if (saw.add(i.toString()))
+			if (saw.add(i.name()))
 				queue.add(i);
 		}
 		return poll;

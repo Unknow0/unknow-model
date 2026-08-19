@@ -22,7 +22,7 @@ public abstract class ModelLoader {
 
 	static {
 		for (PrimitiveModel t : PrimitiveModel.PRIMITIVES) {
-			BUILDIN.put(t.toString(), t);
+			BUILDIN.put(t.simpleName(), t);
 			BUILDIN.put(t.name(), t);
 		}
 	}
@@ -54,7 +54,8 @@ public abstract class ModelLoader {
 	}
 
 	/**
-	 * @param cl class
+	 * get of load a class from it's binary name
+	 * @param cl class name
 	 * @param parameters actual type params
 	 * @return the loaded type
 	 */

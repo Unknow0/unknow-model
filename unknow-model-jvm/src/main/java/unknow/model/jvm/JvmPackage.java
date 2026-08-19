@@ -4,19 +4,19 @@
 package unknow.model.jvm;
 
 import java.util.Arrays;
-import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import unknow.model.api.AnnotationModel;
+import unknow.model.api.ModelLoader;
 import unknow.model.api.PackageModel;
+import unknow.model.api.impl.AbstractPackageModel;
 
 /**
  * @author unknow
  */
-public class JvmPackage implements PackageModel {
-	private final JvmModelLoader loader;
+public class JvmPackage extends AbstractPackageModel implements PackageModel {
 	private final Package p;
-	private Collection<AnnotationModel> annotations;
 
 	/**
 	 * create new JvmPackage
@@ -24,16 +24,14 @@ public class JvmPackage implements PackageModel {
 	 * @param loader the loader
 	 * @param p the package
 	 */
-	public JvmPackage(JvmModelLoader loader, Package p) {
-		this.loader = loader;
+	public JvmPackage(ModelLoader loader, Package p) {
+		super(loader);
 		this.p = p;
 	}
 
 	@Override
-	public Collection<AnnotationModel> annotations() {
-		if (annotations == null)
-			annotations = Arrays.stream(p.getAnnotations()).map(a -> new JvmAnnotation(loader, a)).collect(Collectors.toList());
-		return annotations;
+	protected List<AnnotationModel> loadAnnotations(ModelLoader loader) {
+		return Arrays.stream(p.getAnnotations()).map(a -> new JvmAnnotation(loader, a)).collect(Collectors.toList());
 	}
 
 	@Override

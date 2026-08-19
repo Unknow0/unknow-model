@@ -1,6 +1,5 @@
 package unknow.model.api;
 
-
 import java.util.Arrays;
 import java.util.function.Function;
 
@@ -95,6 +94,11 @@ public interface AnnotationValue {
 	default AnnotationModel[] asArrayAnnotation() {
 		return asArray(ANNOT, a -> a.asAnnotation());
 	}
+
+	/** empty array value */
+	public static final AnnotationValue EMPTY = new AnnotationValueArray(new AnnotationValue[0]);
+	public static final AnnotationValue FALSE = new AnnotationValueLiteral("false");
+	public static final AnnotationValue ZERO = new AnnotationValueLiteral("0");
 
 	/** null value */
 	public static final AnnotationValue NULL = new AnnotationValueNull() {
@@ -262,5 +266,16 @@ public interface AnnotationValue {
 				return false;
 			return a.members().equals(o.members());
 		}
+	}
+
+	public static AnnotationValue defaultValue(TypeModel type) {
+		if (type.isArray())
+			return EMPTY;
+		if (type.isPrimitive()) {
+			if ("boolean".equals(type.name()))
+				return FALSE;
+			return ZERO;
+		}
+		return NULL;
 	}
 }

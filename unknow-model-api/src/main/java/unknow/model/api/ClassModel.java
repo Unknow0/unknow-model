@@ -21,7 +21,7 @@ public interface ClassModel extends TypeModel, WithMod {
 	static final Logger logger = LoggerFactory.getLogger(ClassModel.class);
 
 	/**
-	 * @return super type
+	 * @return super type (null for interface and java.lang.Object)
 	 */
 	ClassModel superType();
 
@@ -33,8 +33,8 @@ public interface ClassModel extends TypeModel, WithMod {
 	/**
 	 * @return the declared constructors
 	 */
-	Collection<ConstructorModel> constructors();
-	
+	Collection<MethodModel> constructors();
+
 	/**
 	 * @return true if this class is an interface
 	 */
@@ -44,12 +44,12 @@ public interface ClassModel extends TypeModel, WithMod {
 	 * @param params the constructor params
 	 * @return a constructors
 	 */
-	default Optional<ConstructorModel> constructors(TypeModel... params) {
+	default Optional<MethodModel> constructors(TypeModel... params) {
 		return constructors().stream().filter(m -> {
 			if (m.parameters().size() != params.length)
 				return false;
 			int i = 0;
-			for (ParamModel<ConstructorModel> p : m.parameters()) {
+			for (ParamModel p : m.parameters()) {
 				if (!p.type().equals(params[i++]))
 					return false;
 			}
@@ -66,12 +66,12 @@ public interface ClassModel extends TypeModel, WithMod {
 	 * @param name field to get
 	 * @return the declared field or null if not found
 	 */
-	default FieldModel field(String name) {
+	default Optional<FieldModel> field(String name) {
 		for (FieldModel f : fields()) {
 			if (name.equals(f.name()))
-				return f;
+				return Optional.of(f);
 		}
-		return null;
+		return Optional.empty();
 	}
 
 	/**
@@ -91,7 +91,7 @@ public interface ClassModel extends TypeModel, WithMod {
 			if (m.parameters().size() != params.length)
 				return false;
 			int i = 0;
-			for (ParamModel<MethodModel> p : m.parameters()) {
+			for (ParamModel p : m.parameters()) {
 				if (!p.type().equals(params[i++]))
 					return false;
 			}
@@ -105,14 +105,13 @@ public interface ClassModel extends TypeModel, WithMod {
 	 * @return the method
 	 */
 	default Optional<MethodModel> findMethod(String name, TypeModel... params) {
-
 		Predicate<MethodModel> f = m -> {
 			if (!name.equals(m.name()))
 				return false;
 			if (m.parameters().size() != params.length)
 				return false;
 			int i = 0;
-			for (ParamModel<MethodModel> p : m.parameters()) {
+			for (ParamModel p : m.parameters()) {
 				if (!p.type().equals(params[i++]))
 					return false;
 			}
@@ -191,12 +190,6 @@ public interface ClassModel extends TypeModel, WithMod {
 		}
 		return false;
 	}
-
-	/**
-	 * @return the full name with the parameters
-	 */
-	@Override
-	String toString();
 
 	/**
 	 * @return true this class is a boxed type for a primitive (Integer, Character, Double, ect..)

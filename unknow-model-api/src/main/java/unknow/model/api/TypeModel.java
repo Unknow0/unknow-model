@@ -15,7 +15,7 @@ public interface TypeModel extends WithAnnotation, WithName, WithParent<PackageM
 	@Override
 	String name();
 
-	/** @return return type fully qualified name without parameter (java.util.List&lt;java.lang.String&gt;) */
+	/** @return return type fully qualified name with parameter (java.util.List&lt;java.lang.String&gt;) */
 	default String genericName() {
 		return name();
 	}
@@ -81,6 +81,27 @@ public interface TypeModel extends WithAnnotation, WithName, WithParent<PackageM
 	}
 
 	/**
+	* @return true if it's a class type
+	*/
+	default boolean isAnnotationDecl() {
+		return this instanceof AnnotationDeclModel;
+	}
+
+	/**
+	 * @return this as a class
+	 */
+	default AnnotationDeclModel asAnnotationDecl() {
+		if (this instanceof AnnotationDeclModel)
+			return (AnnotationDeclModel) this;
+		throw new IllegalStateException(name() + " isn't an annotation declaration");
+	}
+
+	default void ifAnnotationDecl(Consumer<AnnotationDeclModel> c) {
+		if (this instanceof ClassModel)
+			c.accept((AnnotationDeclModel) this);
+	}
+
+	/**
 	 * Determines if the type represented by this {@code TypeModel} object is either the same as, or is a superclass or superinterface of, the type represented by the
 	 * specified {@code TypeModel} parameter
 	 * 
@@ -135,7 +156,7 @@ public interface TypeModel extends WithAnnotation, WithName, WithParent<PackageM
 	}
 
 	default void ifEnum(Consumer<EnumModel> c) {
-		if (this instanceof EnumModel)
+		if (isEnum())
 			c.accept((EnumModel) this);
 	}
 
@@ -143,7 +164,7 @@ public interface TypeModel extends WithAnnotation, WithName, WithParent<PackageM
 	 * @return true if it's an enum
 	 */
 	default boolean isEnum() {
-		return this instanceof EnumModel;
+		return false;
 	}
 
 	/**
@@ -188,6 +209,6 @@ public interface TypeModel extends WithAnnotation, WithName, WithParent<PackageM
 	 * @return true if type are equals
 	 */
 	default boolean equals(TypeModel t) {
-		return t.toString().equals(toString());
+		return t.genericName().equals(genericName());
 	}
 }

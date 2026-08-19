@@ -34,7 +34,7 @@ public interface EnumModel extends ClassModel {
 	 * 
 	 * @author unknow
 	 */
-	public interface EnumConstant extends WithAnnotation {
+	public interface EnumConstant extends WithAnnotation, WithParent<EnumModel> {
 		/**
 		 * @return enum constant name
 		 */

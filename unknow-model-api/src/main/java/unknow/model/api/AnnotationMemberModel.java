@@ -3,12 +3,10 @@ package unknow.model.api;
 public class AnnotationMemberModel implements WithName, AnnotationValue {
 	private final String name;
 	private final AnnotationValue value;
-	private final AnnotationValue defaultValue;
 
-	public AnnotationMemberModel(String name, AnnotationValue value, AnnotationValue defaultValue) {
+	public AnnotationMemberModel(String name, AnnotationValue value) {
 		this.name = name;
 		this.value = value;
-		this.defaultValue = defaultValue;
 	}
 
 	@Override
@@ -34,14 +32,6 @@ public class AnnotationMemberModel implements WithName, AnnotationValue {
 	@Override
 	public AnnotationModel asAnnotation() {
 		return value.asAnnotation();
-	}
-
-	public AnnotationValue defaultValue() {
-		return defaultValue;
-	}
-
-	public boolean isSet() {
-		return !value.valueEquals(defaultValue);
 	}
 
 	@Override

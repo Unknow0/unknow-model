@@ -11,6 +11,9 @@ import java.util.Optional;
  */
 public interface AnnotationModel extends WithName {
 
+	/** @return annotation type */
+	AnnotationDeclModel type();
+
 	/**
 	 * @return all annotation members
 	 */

@@ -23,7 +23,7 @@ public class ArrayModel implements TypeModel, WithType {
 
 	@Override
 	public String name() {
-		return "[" + type.name();
+		return type.name() + "[]";
 	}
 
 	@Override

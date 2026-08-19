@@ -6,7 +6,7 @@
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
 	<artifactId>unknow-model-simple</artifactId>
-	
+
 	<name>${project.groupId}:${project.artifactId}</name>
 	<description>Class model simple implementation</description>
 	<url>https://github.com/Unknow0/unknow-model</url>
@@ -29,16 +29,11 @@
 		<developerConnection>scm:git:ssh://github.com:Unknow0/unknow-model.git</developerConnection>
 		<url>https://github.com/Unknow0/unknow-model</url>
 	</scm>
-	
+
 	<dependencies>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>unknow-model-api</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>${project.groupId}</groupId>
-			<artifactId>unknow-model-jvm</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
