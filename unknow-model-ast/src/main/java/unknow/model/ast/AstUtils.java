@@ -66,13 +66,15 @@ public abstract class AstUtils {
 	 */
 	public static String toBinaryName(ResolvedTypeDeclaration type) {
 		try {
-			String name = type.getName();
+			StringBuilder name = new StringBuilder(type.getName());
 			Optional<ResolvedReferenceTypeDeclaration> containing = type.containerType();
 			while (containing.isPresent()) {
-				name = containing.get().getName() + "$" + name;
+				name.insert(0, '$').insert(0, containing.get().getName());
 				containing = containing.get().containerType();
 			}
-			return type.getPackageName().isEmpty() ? name : type.getPackageName() + "." + name;
+			if (!type.getPackageName().isEmpty())
+				name.insert(0, '.').insert(0, type.getPackageName());
+			return name.toString();
 		} catch (@SuppressWarnings("unused") UnsupportedOperationException e) {
 			String qualifiedName = type.getQualifiedName();
 			StringBuilder name = new StringBuilder(type.getPackageName());

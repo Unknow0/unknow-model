@@ -34,7 +34,7 @@ public class AstAnnotationDecl extends AbstractAnnotationDeclModel implements An
 
 	@Override
 	protected List<AnnotationModel> loadAnnotations(ModelLoader loader) {
-		return a.getAnnotations().stream().map(a -> new AstAnnotation(loader, a)).collect(Collectors.toList());
+		return a.getAnnotations().stream().map(v -> new AstAnnotation(loader, v)).collect(Collectors.toList());
 	}
 
 	@Override
@@ -52,7 +52,7 @@ public class AstAnnotationDecl extends AbstractAnnotationDeclModel implements An
 
 		@Override
 		protected List<AnnotationModel> loadAnnotations(ModelLoader loader) {
-			return a.getAnnotations().stream().map(a -> new AstAnnotation(loader, a)).collect(Collectors.toList());
+			return a.getAnnotations().stream().map(v -> new AstAnnotation(loader, v)).collect(Collectors.toList());
 		}
 
 		@Override

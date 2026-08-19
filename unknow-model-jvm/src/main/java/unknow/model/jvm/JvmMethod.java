@@ -59,12 +59,4 @@ public class JvmMethod extends AbstractMethodModel implements MethodModel, JvmMo
 			params.add(new JvmParam(loader, this, p[i], i));
 		return params;
 	}
-
-	// XXX
-//	@Override
-//	public AnnotationValue defaultValue() {
-//		if (defaultValue == null)
-//			defaultValue = JvmAnnotation.getValue(loader, m.getDefaultValue());
-//		return defaultValue;
-//	}
 }

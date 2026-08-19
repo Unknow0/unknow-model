@@ -64,9 +64,4 @@ public class AstMethod extends AbstractMethodModel implements MethodModel, AstMo
 			params.add(new AstParam(loader, this, p, i++));
 		return params;
 	}
-
-//	@Override
-//	public AnnotationValue defaultValue() {
-//		return AnnotationValue.NULL;
-//	}
 }

@@ -14,7 +14,7 @@ public abstract class AbstractPackageModel implements PackageModel {
 	/**
 	 * @param loader the model loader
 	 */
-	public AbstractPackageModel(ModelLoader loader) {
+	protected AbstractPackageModel(ModelLoader loader) {
 		this.loader = loader;
 	}
 

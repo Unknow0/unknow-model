@@ -64,7 +64,7 @@ public class AstClassOrEnum<T extends TypeDeclaration<?>> extends AbstractEnumMo
 			return loader.get("java.lang.Enum<" + name() + ">").asClass();
 
 		ResolvedReferenceTypeDeclaration r = c.resolve();
-		return loader.get(r.asClass().getSuperClass().map(c -> AstUtils.toBinaryName(c)).orElse("java.lang.Object"), parameters()).asClass();
+		return loader.get(r.asClass().getSuperClass().map(v -> AstUtils.toBinaryName(v)).orElse("java.lang.Object"), parameters()).asClass();
 	}
 
 	@Override
@@ -77,7 +77,7 @@ public class AstClassOrEnum<T extends TypeDeclaration<?>> extends AbstractEnumMo
 			interfaces = (cl.isInterface() ? cl.getExtendedTypes() : cl.getImplementedTypes());
 		} else
 			return Collections.emptyList();
-		return interfaces.stream().map(c -> loader.get(AstUtils.toBinaryName(c.resolve()), parameters()).asClass()).collect(Collectors.toList());
+		return interfaces.stream().map(v -> loader.get(AstUtils.toBinaryName(v.resolve()), parameters()).asClass()).collect(Collectors.toList());
 	}
 
 	@Override
@@ -120,7 +120,7 @@ public class AstClassOrEnum<T extends TypeDeclaration<?>> extends AbstractEnumMo
 	protected List<EnumConstant> loadEntries(ModelLoader loader) {
 		if (!c.isEnumDeclaration())
 			return Collections.emptyList();
-		return c.asEnumDeclaration().getEntries().stream().map(c -> new AstEnumConstant(loader, this, c)).collect(Collectors.toList());
+		return c.asEnumDeclaration().getEntries().stream().map(v -> new AstEnumConstant(loader, this, v)).collect(Collectors.toList());
 	}
 
 }
