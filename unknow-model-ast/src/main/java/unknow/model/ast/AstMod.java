@@ -7,9 +7,11 @@ import unknow.model.api.WithMod;
 
 /**
  * @author unknow
+ * @param <T> node type
  */
 public interface AstMod<T extends NodeWithModifiers<?>> extends WithMod {
 	/**
+	 * get the ast node with modifier
 	 * @return the object with modifier
 	 */
 	T object();

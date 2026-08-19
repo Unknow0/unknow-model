@@ -2,6 +2,7 @@ package unknow.model.simple;
 
 import java.util.Arrays;
 
+import unknow.model.api.AnnotationDeclModel;
 import unknow.model.api.AnnotationValue;
 import unknow.model.api.AnnotationValue.AnnotationValueArray;
 
@@ -28,12 +29,12 @@ public class SimpleAnnotationArray extends AnnotationValueArray {
 		return with(new AnnotationValueLiteral(value));
 	}
 
-	public SimpleAnnotation withAnnotation(Class<?> clazz) {
-		return withAnnotation(clazz.getName());
+	public SimpleAnnotation withAnnotation(Class<?> type) {
+		return withAnnotation(new SimpleAnnotationDecl(type.getName()));
 	}
 
-	private SimpleAnnotation withAnnotation(String name) {
-		SimpleAnnotation an = new SimpleAnnotation(name);
+	public SimpleAnnotation withAnnotation(AnnotationDeclModel type) {
+		SimpleAnnotation an = new SimpleAnnotation(type);
 		with(new AnnotationValueAnnotation(an));
 		return an;
 	}

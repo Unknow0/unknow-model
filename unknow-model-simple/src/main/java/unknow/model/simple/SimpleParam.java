@@ -1,17 +1,16 @@
 package unknow.model.simple;
 
-import unknow.model.api.ClassModel;
+import unknow.model.api.MethodModel;
 import unknow.model.api.ParamModel;
 import unknow.model.api.TypeModel;
-import unknow.model.api.WithParent;
 
-public class SimpleParam<T extends WithParent<ClassModel>> extends SimpleWithAnnotation implements ParamModel<T> {
-	private final T parent;
+public class SimpleParam extends SimpleWithAnnotation implements ParamModel {
+	private final MethodModel parent;
 	private final String name;
 	private final TypeModel type;
 	private final int index;
 
-	public SimpleParam(T parent, String name, TypeModel type, int index) {
+	public SimpleParam(MethodModel parent, String name, TypeModel type, int index) {
 		this.parent = parent;
 		this.name = name;
 		this.type = type;
@@ -29,7 +28,7 @@ public class SimpleParam<T extends WithParent<ClassModel>> extends SimpleWithAnn
 	}
 
 	@Override
-	public T parent() {
+	public MethodModel parent() {
 		return parent;
 	}
 

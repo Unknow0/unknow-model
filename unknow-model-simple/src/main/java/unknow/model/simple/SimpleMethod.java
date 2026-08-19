@@ -3,30 +3,27 @@ package unknow.model.simple;
 import java.util.ArrayList;
 import java.util.List;
 
-import unknow.model.api.AnnotationValue;
 import unknow.model.api.ClassModel;
 import unknow.model.api.MethodModel;
 import unknow.model.api.ParamModel;
 import unknow.model.api.TypeModel;
-import unknow.model.jvm.JvmMod;
 
-public class SimpleMethod extends SimpleWithAnnotation implements MethodModel, JvmMod {
+public class SimpleMethod extends SimpleWithMod implements MethodModel {
 	private final ClassModel parent;
 	private final String name;
-	private final int mod;
 	private final TypeModel type;
-	private final List<ParamModel<MethodModel>> params;
+	private final List<ParamModel> params;
 
 	public SimpleMethod(ClassModel parent, String name, int mod, TypeModel type) {
+		super(mod);
 		this.parent = parent;
 		this.name = name;
-		this.mod = mod;
 		this.type = type;
 		this.params = new ArrayList<>(0);
 	}
 
-	public SimpleParam<MethodModel> withParam(String name, TypeModel type) {
-		SimpleParam<MethodModel> p = new SimpleParam<>(this, name, type, params.size());
+	public SimpleParam withParam(String name, TypeModel type) {
+		SimpleParam p = new SimpleParam(this, name, type, params.size());
 		params.add(p);
 		return p;
 	}
@@ -34,11 +31,6 @@ public class SimpleMethod extends SimpleWithAnnotation implements MethodModel, J
 	@Override
 	public String name() {
 		return name;
-	}
-
-	@Override
-	public int mod() {
-		return mod;
 	}
 
 	@Override
@@ -52,12 +44,7 @@ public class SimpleMethod extends SimpleWithAnnotation implements MethodModel, J
 	}
 
 	@Override
-	public List<ParamModel<MethodModel>> parameters() {
+	public List<ParamModel> parameters() {
 		return params;
-	}
-
-	@Override
-	public AnnotationValue defaultValue() {
-		return null;
 	}
 }

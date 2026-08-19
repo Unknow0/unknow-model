@@ -4,51 +4,46 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import unknow.model.api.AnnotationDeclModel;
 import unknow.model.api.AnnotationMemberModel;
 import unknow.model.api.AnnotationModel;
-import unknow.model.api.AnnotationValue;
-import unknow.model.api.TypeModel;
 import unknow.model.api.AnnotationValue.AnnotationValueClass;
 import unknow.model.api.AnnotationValue.AnnotationValueLiteral;
+import unknow.model.api.TypeModel;
 
 public class SimpleAnnotation implements AnnotationModel {
-	private final String name;
+	private final AnnotationDeclModel type;
 	private final List<AnnotationMemberModel> members;
 
-	public SimpleAnnotation(String name) {
-		this.name = name;
+	public SimpleAnnotation(AnnotationDeclModel type) {
+		this.type = type;
 		this.members = new ArrayList<>(0);
 	}
 
 	public SimpleAnnotation withLiteral(String name, String value) {
-		return withLiteral(name, value, null);
-	}
-
-	public SimpleAnnotation withLiteral(String name, String value, String defValue) {
-		AnnotationValue def = defValue == null ? AnnotationValue.NULL : new AnnotationValueLiteral(defValue);
-		members.add(new AnnotationMemberModel(name, new AnnotationValueLiteral(value), def));
+		members.add(new AnnotationMemberModel(name, new AnnotationValueLiteral(value)));
 		return this;
 	}
 
 	public SimpleAnnotation withClass(String name, TypeModel type) {
-		return withClass(name, type, null);
-	}
-
-	public SimpleAnnotation withClass(String name, TypeModel type, TypeModel defValue) {
-		AnnotationValue def = defValue == null ? AnnotationValue.NULL : new AnnotationValueClass(defValue);
-		members.add(new AnnotationMemberModel(name, new AnnotationValueClass(type), def));
+		members.add(new AnnotationMemberModel(name, new AnnotationValueClass(type)));
 		return this;
 	}
 
 	public SimpleAnnotationArray withArray(String name) {
 		SimpleAnnotationArray a = new SimpleAnnotationArray();
-		members.add(new AnnotationMemberModel(name, a, AnnotationValue.NULL));
+		members.add(new AnnotationMemberModel(name, a));
 		return a;
 	}
 
 	@Override
 	public String name() {
-		return name;
+		return type.name();
+	}
+
+	@Override
+	public AnnotationDeclModel type() {
+		return type;
 	}
 
 	@Override

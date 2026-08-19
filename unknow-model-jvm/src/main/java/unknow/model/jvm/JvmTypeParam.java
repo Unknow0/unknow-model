@@ -5,25 +5,21 @@ package unknow.model.jvm;
 
 import java.lang.reflect.TypeVariable;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import unknow.model.api.AnnotationModel;
 import unknow.model.api.ClassModel;
+import unknow.model.api.ModelLoader;
 import unknow.model.api.TypeModel;
 import unknow.model.api.TypeParamModel;
+import unknow.model.api.impl.AbstractTypeParamModel;
 
 /**
  * @author unknow
  */
-public class JvmTypeParam implements TypeParamModel {
-	private final JvmModelLoader loader;
-	private final ClassModel c;
+public class JvmTypeParam extends AbstractTypeParamModel implements TypeParamModel {
 	private final TypeVariable<?> t;
-	private final TypeModel type;
-	private Collection<AnnotationModel> annotations;
-	private List<ClassModel> bounds;
 
 	/**
 	 * create new JvmTypeParam
@@ -33,11 +29,9 @@ public class JvmTypeParam implements TypeParamModel {
 	 * @param t the param variable
 	 * @param type the concrete type
 	 */
-	public JvmTypeParam(JvmModelLoader loader, ClassModel c, TypeVariable<?> t, TypeModel type) {
-		this.loader = loader;
-		this.c = c;
+	public JvmTypeParam(ModelLoader loader, ClassModel c, TypeVariable<?> t, TypeModel type) {
+		super(loader, c, type);
 		this.t = t;
-		this.type = type;
 	}
 
 	@Override
@@ -46,35 +40,12 @@ public class JvmTypeParam implements TypeParamModel {
 	}
 
 	@Override
-	public ClassModel parent() {
-		return c;
+	protected List<AnnotationModel> loadAnnotations(ModelLoader loader) {
+		return Arrays.stream(t.getAnnotations()).map(a -> new JvmAnnotation(loader, a)).collect(Collectors.toList());
 	}
 
 	@Override
-	public TypeModel type() {
-		return type;
+	protected List<ClassModel> loadBounds(ModelLoader loader) {
+		return Arrays.stream(t.getBounds()).map(b -> loader.get(b.getTypeName(), parent().parameters()).asClass()).collect(Collectors.toList());
 	}
-
-	@Override
-	public Collection<AnnotationModel> annotations() {
-		if (annotations == null)
-			annotations = Arrays.stream(t.getAnnotations()).map(a -> new JvmAnnotation(loader, a)).collect(Collectors.toList());
-		return annotations;
-	}
-
-	@Override
-	public List<ClassModel> bounds() {
-		if (bounds == null)
-			bounds = Arrays.stream(t.getBounds()).map(b -> loader.get(b.getTypeName(), c.parameters()).asClass()).collect(Collectors.toList());
-		return bounds;
-	}
-
-	@Override
-	public String toString() {
-		StringBuilder sb = new StringBuilder(name());
-		if (type() != null)
-			sb.append('[').append(type()).append(']');
-		return sb.toString();
-	}
-
 }

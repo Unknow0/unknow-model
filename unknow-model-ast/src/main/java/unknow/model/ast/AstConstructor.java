@@ -1,7 +1,6 @@
 package unknow.model.ast;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -10,19 +9,17 @@ import com.github.javaparser.ast.body.Parameter;
 
 import unknow.model.api.AnnotationModel;
 import unknow.model.api.ClassModel;
-import unknow.model.api.ConstructorModel;
+import unknow.model.api.MethodModel;
 import unknow.model.api.ModelLoader;
 import unknow.model.api.ParamModel;
+import unknow.model.api.TypeModel;
+import unknow.model.api.impl.AbstractMethodModel;
 
 /**
  * @author unknow
  */
-public class AstConstructor implements ConstructorModel, AstMod<ConstructorDeclaration> {
-	private final ClassModel parent;
-	private final ModelLoader loader;
+public class AstConstructor extends AbstractMethodModel implements MethodModel, AstMod<ConstructorDeclaration> {
 	private final ConstructorDeclaration c;
-	private Collection<AnnotationModel> annotations;
-	private List<ParamModel<ConstructorModel>> params;
 
 	/**
 	 * create new AstMethod
@@ -31,23 +28,14 @@ public class AstConstructor implements ConstructorModel, AstMod<ConstructorDecla
 	 * @param loader the loader
 	 * @param c the constructor
 	 */
-	public AstConstructor(ClassModel parent, ModelLoader loader, ConstructorDeclaration c) {
-		this.parent = parent;
-		this.loader = loader;
+	public AstConstructor(ModelLoader loader, ClassModel parent, ConstructorDeclaration c) {
+		super(loader, parent, "<init>");
 		this.c = c;
 	}
 
 	@Override
-	public ClassModel parent() {
-		return parent;
-	}
-
-	@Override
-	public Collection<AnnotationModel> annotations() {
-		if (annotations == null) {
-			annotations = c.getAnnotations().stream().map(a -> new AstAnnotation(loader, a)).collect(Collectors.toList());
-		}
-		return annotations;
+	protected List<AnnotationModel> loadAnnotations(ModelLoader loader) {
+		return c.getAnnotations().stream().map(a -> new AstAnnotation(loader, a)).collect(Collectors.toList());
 	}
 
 	@Override
@@ -56,18 +44,16 @@ public class AstConstructor implements ConstructorModel, AstMod<ConstructorDecla
 	}
 
 	@Override
-	public List<ParamModel<ConstructorModel>> parameters() {
-		if (params == null) {
-			int i = 0;
-			params = new ArrayList<>();
-			for (Parameter p : c.getParameters())
-				params.add(new AstParam<>(loader, this, p, i++));
-		}
+	protected List<ParamModel> loadParameters(ModelLoader loader) {
+		int i = 0;
+		List<ParamModel> params = new ArrayList<>();
+		for (Parameter p : c.getParameters())
+			params.add(new AstParam(loader, this, p, i++));
 		return params;
 	}
 
 	@Override
-	public String toString() {
-		return parent.name() + "." + signature();
+	protected TypeModel loadType(ModelLoader loader) {
+		return null;
 	}
 }

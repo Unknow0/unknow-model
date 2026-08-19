@@ -6,18 +6,14 @@ import java.util.Collections;
 import java.util.List;
 
 import unknow.model.api.ClassModel;
-import unknow.model.api.ConstructorModel;
 import unknow.model.api.FieldModel;
 import unknow.model.api.MethodModel;
 import unknow.model.api.PackageModel;
 import unknow.model.api.TypeModel;
 import unknow.model.api.TypeParamModel;
-import unknow.model.jvm.JvmMod;
-import unknow.model.jvm.JvmModelLoader;
 
-public class SimpleClass extends SimpleWithAnnotation implements ClassModel, JvmMod {
+public class SimpleClass extends SimpleWithMod implements ClassModel {
 	private final String name;
-	private final int mod;
 	private final boolean isInterface;
 	private final List<FieldModel> fields = new ArrayList<>();
 	private final List<MethodModel> methods = new ArrayList<>();
@@ -28,8 +24,8 @@ public class SimpleClass extends SimpleWithAnnotation implements ClassModel, Jvm
 	}
 
 	public SimpleClass(String name, int mod, boolean isInterface) {
+		super(mod);
 		this.name = name;
-		this.mod = mod;
 		this.isInterface = isInterface;
 		int i = name.lastIndexOf(".");
 		this.parent = new SimplePackage(i < 0 ? "" : name.substring(i + 1));
@@ -52,18 +48,13 @@ public class SimpleClass extends SimpleWithAnnotation implements ClassModel, Jvm
 	}
 
 	@Override
-	public int mod() {
-		return mod;
-	}
-
-	@Override
 	public boolean isInterface() {
 		return isInterface;
 	}
 
 	@Override
 	public ClassModel superType() {
-		return JvmModelLoader.GLOBAL.get("java.lang.Object").asClass();
+		return null;
 	}
 
 	@Override
@@ -72,7 +63,7 @@ public class SimpleClass extends SimpleWithAnnotation implements ClassModel, Jvm
 	}
 
 	@Override
-	public Collection<ConstructorModel> constructors() {
+	public Collection<MethodModel> constructors() {
 		return Collections.emptyList();
 	}
 

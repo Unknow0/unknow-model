@@ -1,6 +1,6 @@
 package unknow.model.ast;
 
-import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import com.github.javaparser.ast.PackageDeclaration;
@@ -8,14 +8,13 @@ import com.github.javaparser.ast.PackageDeclaration;
 import unknow.model.api.AnnotationModel;
 import unknow.model.api.ModelLoader;
 import unknow.model.api.PackageModel;
+import unknow.model.api.impl.AbstractPackageModel;
 
 /**
  * @author unknow
  */
-public class AstPackage implements PackageModel {
-	private final ModelLoader loader;
+public class AstPackage extends AbstractPackageModel implements PackageModel {
 	private final PackageDeclaration p;
-	private Collection<AnnotationModel> annotations;
 
 	/**
 	 * create new AstPackage
@@ -24,20 +23,12 @@ public class AstPackage implements PackageModel {
 	 * @param p the package
 	 */
 	public AstPackage(ModelLoader loader, PackageDeclaration p) {
-		this.loader = loader;
+		super(loader, p.getNameAsString());
 		this.p = p;
 	}
 
 	@Override
-	public Collection<AnnotationModel> annotations() {
-		if (annotations == null)
-			annotations = p.getAnnotations().stream().map(a -> new AstAnnotation(loader, a)).collect(Collectors.toList());
-		return annotations;
+	protected List<AnnotationModel> loadAnnotations(ModelLoader loader) {
+		return p.getAnnotations().stream().map(a -> new AstAnnotation(loader, a)).collect(Collectors.toList());
 	}
-
-	@Override
-	public String name() {
-		return p.getNameAsString();
-	}
-
 }

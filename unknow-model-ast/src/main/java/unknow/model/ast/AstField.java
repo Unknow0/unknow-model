@@ -1,6 +1,5 @@
 package unknow.model.ast;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -8,21 +7,19 @@ import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.body.VariableDeclarator;
 
 import unknow.model.api.AnnotationModel;
+import unknow.model.api.AnnotationValue;
 import unknow.model.api.ClassModel;
 import unknow.model.api.FieldModel;
 import unknow.model.api.ModelLoader;
 import unknow.model.api.TypeModel;
+import unknow.model.api.impl.AbstractFieldModel;
 
 /**
  * @author unknow
  */
-public class AstField implements FieldModel, AstMod<FieldDeclaration> {
-	private final ModelLoader loader;
-	private final ClassModel cl;
+public class AstField extends AbstractFieldModel implements FieldModel, AstMod<FieldDeclaration> {
 	private final FieldDeclaration f;
 	private final VariableDeclarator v;
-	private List<AnnotationModel> annotations;
-	private TypeModel type;
 
 	/**
 	 * create new AstField
@@ -33,17 +30,14 @@ public class AstField implements FieldModel, AstMod<FieldDeclaration> {
 	 * @param v the variable
 	 */
 	public AstField(ModelLoader loader, ClassModel cl, FieldDeclaration f, VariableDeclarator v) {
-		this.loader = loader;
-		this.cl = cl;
+		super(loader, cl);
 		this.f = f;
 		this.v = v;
 	}
 
 	@Override
-	public Collection<AnnotationModel> annotations() {
-		if (annotations == null)
-			annotations = f.getAnnotations().stream().map(a -> new AstAnnotation(loader, a)).collect(Collectors.toList());
-		return annotations;
+	protected List<AnnotationModel> loadAnnotations(ModelLoader loader) {
+		return f.getAnnotations().stream().map(a -> new AstAnnotation(loader, a)).collect(Collectors.toList());
 	}
 
 	@Override
@@ -57,20 +51,12 @@ public class AstField implements FieldModel, AstMod<FieldDeclaration> {
 	}
 
 	@Override
-	public ClassModel parent() {
-		return cl;
+	protected TypeModel loadType(ModelLoader loader) {
+		return loader.get(AstUtils.toBinaryName(v.getType().resolve()), parent().parameters());
 	}
 
 	@Override
-	public String toString() {
-		return type() + " " + name();
+	public AnnotationValue value(ModelLoader loader) {
+		return AstAnnotation.value(loader, f.getVariable(0).getInitializer().orElseThrow(() -> new IllegalArgumentException("Can't find value for " + this)));
 	}
-
-	@Override
-	public TypeModel type() {
-		if (type == null)
-			type = loader.get(v.getType().resolve().describe(), cl.parameters());
-		return type;
-	}
-
 }

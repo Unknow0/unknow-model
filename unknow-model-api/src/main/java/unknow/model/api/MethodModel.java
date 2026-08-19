@@ -13,18 +13,13 @@ public interface MethodModel extends WithAnnotation, WithMod, WithName, WithType
 	/**
 	 * @return generic param
 	 */
-	List<ParamModel<MethodModel>> parameters();
-
-	/**
-	 * @return annotation default value
-	 */
-	AnnotationValue defaultValue();
+	List<ParamModel> parameters();
 
 	/**
 	 * @param i index of the parameter to get
 	 * @return get the i'th parameter
 	 */
-	default ParamModel<MethodModel> parameter(int i) {
+	default ParamModel parameter(int i) {
 		return parameters().get(i);
 	}
 
@@ -34,7 +29,7 @@ public interface MethodModel extends WithAnnotation, WithMod, WithName, WithType
 	default String signature() {
 		StringBuilder sb = new StringBuilder(name()).append('(');
 		if (!parameters().isEmpty()) {
-			for (ParamModel<MethodModel> t : parameters())
+			for (ParamModel t : parameters())
 				sb.append(t.type().name()).append(',');
 			sb.setLength(sb.length() - 1);
 		}

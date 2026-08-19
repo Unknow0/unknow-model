@@ -1,6 +1,5 @@
 package unknow.model.api;
 
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -143,7 +142,7 @@ public class BeanProperty implements WithName, WithAnnotation, WithType {
 			logger.info("Setter not found matching {}", getter);
 			return null;
 		}
-		FieldModel field = clazz.field(name);
+		FieldModel field = clazz.field(name).orElse(null);
 		if (field != null && !getter.type().isAssignableFrom(field.type())) {
 			logger.warn("Field {} don't match {}", field, getter);
 			return null;

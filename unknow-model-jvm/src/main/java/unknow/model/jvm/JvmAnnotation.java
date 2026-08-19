@@ -4,22 +4,23 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import unknow.model.api.AnnotationMemberModel;
 import unknow.model.api.AnnotationModel;
 import unknow.model.api.AnnotationValue;
-import unknow.model.api.ModelLoader;
 import unknow.model.api.AnnotationValue.AnnotationValueAnnotation;
 import unknow.model.api.AnnotationValue.AnnotationValueArray;
 import unknow.model.api.AnnotationValue.AnnotationValueClass;
 import unknow.model.api.AnnotationValue.AnnotationValueLiteral;
+import unknow.model.api.ModelLoader;
+import unknow.model.api.impl.AbstractAnnotationModel;
 
 /**
  * @author unknow
  */
-public class JvmAnnotation implements AnnotationModel {
+public class JvmAnnotation extends AbstractAnnotationModel implements AnnotationModel {
 	private final Annotation a;
-	private final Collection<AnnotationMemberModel> members;
 
 	/**
 	 * create new JvmAnnotation
@@ -28,36 +29,24 @@ public class JvmAnnotation implements AnnotationModel {
 	 * @param a the annotation
 	 */
 	public JvmAnnotation(ModelLoader loader, Annotation a) {
+		super(loader, a.annotationType().getName());
 		this.a = a;
-		this.members = new ArrayList<>();
+	}
 
+	@Override
+	protected Collection<AnnotationMemberModel> loadMembers(ModelLoader loader) {
+		List<AnnotationMemberModel> members = new ArrayList<>();
 		Method[] methods = a.annotationType().getDeclaredMethods();
 		for (int i = 0; i < methods.length; i++) {
 			Method m = methods[i];
-			AnnotationValue def = getValue(loader, m.getDefaultValue());
 			try {
 				AnnotationValue value = getValue(loader, m.invoke(a));
-
-				members.add(new AnnotationMemberModel(m.getName(), value, def));
+				members.add(new AnnotationMemberModel(m.getName(), value));
 			} catch (Exception e) {
 				throw new IllegalArgumentException(e);
 			}
 		}
-	}
-
-	@Override
-	public String name() {
-		return a.annotationType().getName();
-	}
-
-	@Override
-	public Collection<AnnotationMemberModel> members() {
 		return members;
-	}
-
-	@Override
-	public String toString() {
-		return name();
 	}
 
 	/**

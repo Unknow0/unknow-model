@@ -1,7 +1,6 @@
 package unknow.model.ast;
 
-import java.io.IOException;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,12 +15,11 @@ import unknow.model.test.AbstractTestLoader;
 public class ModelLoaderTest extends AbstractTestLoader {
 	static final Logger logger = LoggerFactory.getLogger(ModelLoaderTest.class);
 
-	protected ModelLoaderTest() throws IOException {
+	protected ModelLoaderTest() {
 		super(loader());
 	}
 
-	private static ModelLoader loader() throws IOException {
-		return ModelLoader.from(AstModelLoaderBuilder.build(Paths.get(System.getProperty("basedir"), "..", "unknow-model-test", "src", "main", "java")),
-				JvmModelLoader.GLOBAL);
+	private static ModelLoader loader() {
+		return ModelLoader.from(new AstModelLoader(Path.of(System.getProperty("basedir"), "..", "unknow-model-test", "src", "main", "java")), JvmModelLoader.GLOBAL);
 	}
 }

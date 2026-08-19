@@ -1,7 +1,6 @@
 package unknow.model.ast;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -10,23 +9,18 @@ import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.Parameter;
 
 import unknow.model.api.AnnotationModel;
-import unknow.model.api.AnnotationValue;
 import unknow.model.api.ClassModel;
 import unknow.model.api.MethodModel;
 import unknow.model.api.ModelLoader;
 import unknow.model.api.ParamModel;
 import unknow.model.api.TypeModel;
+import unknow.model.api.impl.AbstractMethodModel;
 
 /**
  * @author unknow
  */
-public class AstMethod implements MethodModel, AstMod<MethodDeclaration> {
-	private final ClassModel parent;
-	private final ModelLoader loader;
+public class AstMethod extends AbstractMethodModel implements MethodModel, AstMod<MethodDeclaration> {
 	private final MethodDeclaration m;
-	private Collection<AnnotationModel> annotations;
-	private TypeModel type;
-	private List<ParamModel<MethodModel>> params;
 
 	/**
 	 * create new AstMethod
@@ -35,28 +29,19 @@ public class AstMethod implements MethodModel, AstMod<MethodDeclaration> {
 	 * @param loader the loader
 	 * @param m the method
 	 */
-	public AstMethod(ClassModel parent, ModelLoader loader, MethodDeclaration m) {
-		this.parent = parent;
-		this.loader = loader;
+	public AstMethod(ModelLoader loader, ClassModel parent, MethodDeclaration m) {
+		super(loader, parent, m.getNameAsString());
 		this.m = m;
 	}
 
 	@Override
-	public ClassModel parent() {
-		return parent;
-	}
-
-	@Override
-	public Collection<AnnotationModel> annotations() {
-		if (annotations == null) {
-			annotations = m.getAnnotations().stream().map(a -> new AstAnnotation(loader, a)).collect(Collectors.toList());
-		}
-		return annotations;
+	protected List<AnnotationModel> loadAnnotations(ModelLoader loader) {
+		return m.getAnnotations().stream().map(a -> new AstAnnotation(loader, a)).collect(Collectors.toList());
 	}
 
 	@Override
 	public boolean isPublic() {
-		if (parent.isInterface())
+		if (parent().isInterface())
 			return true;
 		return object().getModifiers().stream().anyMatch(m -> m.getKeyword() == Keyword.PUBLIC);
 	}
@@ -67,35 +52,16 @@ public class AstMethod implements MethodModel, AstMod<MethodDeclaration> {
 	}
 
 	@Override
-	public String name() {
-		return m.getNameAsString();
+	protected TypeModel loadType(ModelLoader loader) {
+		return loader.get(AstUtils.toBinaryName(m.getType().resolve()), parent().parameters());
 	}
 
 	@Override
-	public String toString() {
-		return parent.name() + "." + signature();
-	}
-
-	@Override
-	public TypeModel type() {
-		if (type == null)
-			type = loader.get(m.getType().resolve().describe(), parent.parameters());
-		return type;
-	}
-
-	@Override
-	public List<ParamModel<MethodModel>> parameters() {
-		if (params == null) {
-			int i = 0;
-			params = new ArrayList<>();
-			for (Parameter p : m.getParameters())
-				params.add(new AstParam<>(loader, this, p, i++));
-		}
+	protected List<ParamModel> loadParameters(ModelLoader loader) {
+		int i = 0;
+		List<ParamModel> params = new ArrayList<>();
+		for (Parameter p : m.getParameters())
+			params.add(new AstParam(loader, this, p, i++));
 		return params;
-	}
-
-	@Override
-	public AnnotationValue defaultValue() {
-		return AnnotationValue.NULL;
 	}
 }

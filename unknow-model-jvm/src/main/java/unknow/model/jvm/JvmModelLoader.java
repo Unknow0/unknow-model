@@ -29,22 +29,17 @@ public class JvmModelLoader extends ModelLoader {
 		Class<?> c = tryLoad(cl);
 		if (c == null)
 			return null;
-
-		if (c.isEnum())
-			return new JvmEnum(this, c, params);
-		return new JvmClass(this, c, params);
+		JvmPackage parent = new JvmPackage(loader, c.getPackage());
+		if (c.isAnnotation())
+			return new JvmAnnotationDecl(this, parent, c);
+		return new JvmClassOrEnum(this, parent, c, params);
 	}
 
 	private Class<?> tryLoad(String clazz) {
-		while (true) {
-			try {
-				return cl.loadClass(clazz);
-			} catch (@SuppressWarnings("unused") ClassNotFoundException e) {
-				int i = clazz.lastIndexOf('.');
-				if (i < 0)
-					return null;
-				clazz = clazz.substring(0, i) + "$" + clazz.substring(i + 1);
-			}
+		try {
+			return cl.loadClass(clazz);
+		} catch (@SuppressWarnings("unused") ClassNotFoundException e) {
+			return null;
 		}
 	}
 }
