@@ -23,7 +23,7 @@ import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeS
 import unknow.model.api.ModelLoader;
 import unknow.model.api.PackageModel;
 import unknow.model.api.TypeModel;
-import unknow.model.api.impl.EmptyPackageModel;
+import unknow.model.api.impl.AbstractPackageModel.EmptyPackageModel;
 
 /**
  * @author unknow

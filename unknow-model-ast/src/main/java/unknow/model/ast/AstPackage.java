@@ -23,7 +23,7 @@ public class AstPackage extends AbstractPackageModel implements PackageModel {
 	 * @param p the package
 	 */
 	public AstPackage(ModelLoader loader, PackageDeclaration p) {
-		super(loader);
+		super(loader, p.getNameAsString());
 		this.p = p;
 	}
 
@@ -31,10 +31,4 @@ public class AstPackage extends AbstractPackageModel implements PackageModel {
 	protected List<AnnotationModel> loadAnnotations(ModelLoader loader) {
 		return p.getAnnotations().stream().map(a -> new AstAnnotation(loader, a)).collect(Collectors.toList());
 	}
-
-	@Override
-	public String name() {
-		return p.getNameAsString();
-	}
-
 }

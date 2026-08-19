@@ -25,7 +25,7 @@ public class JvmPackage extends AbstractPackageModel implements PackageModel {
 	 * @param p the package
 	 */
 	public JvmPackage(ModelLoader loader, Package p) {
-		super(loader);
+		super(loader, p.getName());
 		this.p = p;
 	}
 
@@ -33,10 +33,4 @@ public class JvmPackage extends AbstractPackageModel implements PackageModel {
 	protected List<AnnotationModel> loadAnnotations(ModelLoader loader) {
 		return Arrays.stream(p.getAnnotations()).map(a -> new JvmAnnotation(loader, a)).collect(Collectors.toList());
 	}
-
-	@Override
-	public String name() {
-		return p.getName();
-	}
-
 }

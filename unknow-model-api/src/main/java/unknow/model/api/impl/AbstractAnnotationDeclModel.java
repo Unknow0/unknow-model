@@ -4,15 +4,12 @@ import java.util.Collection;
 import java.util.List;
 
 import unknow.model.api.AnnotationDeclModel;
-import unknow.model.api.AnnotationModel;
 import unknow.model.api.ModelLoader;
 import unknow.model.api.PackageModel;
 
-public abstract class AbstractAnnotationDeclModel implements AnnotationDeclModel {
-	private final ModelLoader loader;
+public abstract class AbstractAnnotationDeclModel extends AbstractWithAnnotation implements AnnotationDeclModel {
 	private final PackageModel parent;
 	private final String name;
-	private Collection<AnnotationModel> annotations;
 	private Collection<AnnotationMemberDeclModel> members;
 
 	/**
@@ -21,16 +18,10 @@ public abstract class AbstractAnnotationDeclModel implements AnnotationDeclModel
 	 * @param name the annotation binary name
 	 */
 	protected AbstractAnnotationDeclModel(ModelLoader loader, PackageModel parent, String name) {
-		this.loader = loader;
+		super(loader);
 		this.parent = parent;
 		this.name = name;
 	}
-
-	/**
-	 * @param loader the model loader
-	 * @return annotations
-	 */
-	protected abstract List<AnnotationModel> loadAnnotations(ModelLoader loader);
 
 	/**
 	 * @param loader the model loader
@@ -46,13 +37,6 @@ public abstract class AbstractAnnotationDeclModel implements AnnotationDeclModel
 	@Override
 	public final String name() {
 		return name;
-	}
-
-	@Override
-	public final Collection<AnnotationModel> annotations() {
-		if (annotations == null)
-			annotations = loadAnnotations(loader);
-		return annotations;
 	}
 
 	@Override

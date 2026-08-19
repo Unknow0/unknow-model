@@ -3,7 +3,6 @@ package unknow.model.api.impl;
 import java.util.Collection;
 import java.util.List;
 
-import unknow.model.api.AnnotationModel;
 import unknow.model.api.ClassModel;
 import unknow.model.api.FieldModel;
 import unknow.model.api.MethodModel;
@@ -12,9 +11,7 @@ import unknow.model.api.PackageModel;
 import unknow.model.api.TypeModel;
 import unknow.model.api.TypeParamModel;
 
-public abstract class AbstractClassModel implements ClassModel {
-	/** the loader */
-	protected final ModelLoader loader;
+public abstract class AbstractClassModel extends AbstractWithAnnotation implements ClassModel {
 	private final PackageModel parent;
 	private final String name;
 	private final TypeModel[] paramsClass;
@@ -22,7 +19,6 @@ public abstract class AbstractClassModel implements ClassModel {
 	private ClassModel superType;
 	private List<ClassModel> interfaces;
 	private List<TypeParamModel> parameters;
-	private Collection<AnnotationModel> annotations;
 	private Collection<MethodModel> constructors;
 	private Collection<FieldModel> fields;
 	private Collection<MethodModel> methods;
@@ -36,7 +32,7 @@ public abstract class AbstractClassModel implements ClassModel {
 	 * @param paramsClass class parameter
 	 */
 	protected AbstractClassModel(ModelLoader loader, PackageModel parent, String name, TypeModel[] paramsClass) {
-		this.loader = loader;
+		super(loader);
 		this.parent = parent;
 		this.name = name;
 		this.paramsClass = paramsClass;
@@ -53,12 +49,6 @@ public abstract class AbstractClassModel implements ClassModel {
 	 * @return interfaces binary name
 	 */
 	protected abstract List<ClassModel> loadInterfaces(ModelLoader loader);
-
-	/**
-	 * @param loader the model loader
-	 * @return annotations
-	 */
-	protected abstract List<AnnotationModel> loadAnnotations(ModelLoader loader);
 
 	/**
 	 * @param loader the model loader
@@ -127,13 +117,6 @@ public abstract class AbstractClassModel implements ClassModel {
 		if (parameters == null)
 			parameters = loadParameters(loader, paramsClass);
 		return parameters;
-	}
-
-	@Override
-	public final Collection<AnnotationModel> annotations() {
-		if (annotations == null)
-			annotations = loadAnnotations(loader);
-		return annotations;
 	}
 
 	@Override

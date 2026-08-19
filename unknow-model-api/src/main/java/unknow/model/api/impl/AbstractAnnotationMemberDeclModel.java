@@ -1,19 +1,13 @@
 package unknow.model.api.impl;
 
-import java.util.Collection;
-import java.util.List;
-
 import unknow.model.api.AnnotationDeclModel;
 import unknow.model.api.AnnotationDeclModel.AnnotationMemberDeclModel;
-import unknow.model.api.AnnotationModel;
 import unknow.model.api.AnnotationValue;
 import unknow.model.api.ModelLoader;
 
-public abstract class AbstractAnnotationMemberDeclModel implements AnnotationMemberDeclModel {
-	private final ModelLoader loader;
+public abstract class AbstractAnnotationMemberDeclModel extends AbstractWithAnnotation implements AnnotationMemberDeclModel {
 	private final AnnotationDeclModel parent;
 	private final String name;
-	private Collection<AnnotationModel> annotations;
 	private AnnotationValue value;
 
 	/**
@@ -22,16 +16,10 @@ public abstract class AbstractAnnotationMemberDeclModel implements AnnotationMem
 	 * @param name member name
 	 */
 	protected AbstractAnnotationMemberDeclModel(ModelLoader loader, AnnotationDeclModel parent, String name) {
-		this.loader = loader;
+		super(loader);
 		this.parent = parent;
 		this.name = name;
 	}
-
-	/**
-	 * @param loader the model loader
-	 * @return annotations
-	 */
-	protected abstract List<AnnotationModel> loadAnnotations(ModelLoader loader);
 
 	/**
 	 * @param loader the model loader
@@ -47,13 +35,6 @@ public abstract class AbstractAnnotationMemberDeclModel implements AnnotationMem
 	@Override
 	public final String name() {
 		return name;
-	}
-
-	@Override
-	public Collection<AnnotationModel> annotations() {
-		if (annotations == null)
-			annotations = loadAnnotations(loader);
-		return annotations;
 	}
 
 	@Override
