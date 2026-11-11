@@ -12,6 +12,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import unknow.model.api.impl.AbstractPackageModel.EmptyPackageModel;
+
 /**
  * @author unknow
  */
@@ -30,9 +32,12 @@ public abstract class ModelLoader {
 	protected static final Pattern CLAZZ = Pattern.compile("(.+?)(?:<(.*?)>)?");
 	protected static final Pattern CLAZZ_LIST = Pattern.compile("(.+?(?:<.*?>)?)(?:,|$)");
 
-	private final Map<String, TypeModel> cache = new HashMap<>();
+	private final Map<String, PackageModel> packages;
+	private final Map<String, TypeModel> cache;
 
 	protected ModelLoader() {
+		this.packages = new HashMap<>();
+		this.cache = new HashMap<>();
 	}
 
 	/**
@@ -72,6 +77,17 @@ public abstract class ModelLoader {
 		return t;
 	}
 
+	public PackageModel getPackage(String name) {
+		PackageModel p = packages.get(name);
+		if (p == null) {
+			p = loadPackage(this, name);
+			if (p == null)
+				p = new EmptyPackageModel(name);
+			packages.put(name, p);
+		}
+		return p;
+	}
+
 	private final TypeModel create(String cl, List<TypeParamModel> parameters) {
 		TypeModel b = BUILDIN.get(cl);
 		if (b != null)
@@ -104,15 +120,25 @@ public abstract class ModelLoader {
 		if (t != null)
 			cl = t.name();
 
-		return load(this, cl, params);
+		int i = cl.lastIndexOf('.');
+		PackageModel p = getPackage(i < 0 ? "" : cl.substring(0, i));
+		return load(this, p, cl, params);
 	}
 
 	/**
 	 * @param loader the loader
+	 * @param parent package defining the type
 	 * @param cl the fqn class to load
 	 * @param params the concrete generic param
 	 */
-	protected abstract TypeModel load(ModelLoader loader, String cl, TypeModel[] params);
+	protected abstract TypeModel load(ModelLoader loader, PackageModel parent, String cl, TypeModel[] params);
+
+	/**
+	 * @param loader the loader
+	 * @param name package name
+	 * @return the packageModel or null if no package defined
+	 */
+	protected abstract PackageModel loadPackage(ModelLoader loader, String name);
 
 	/**
 	 * split class into the class name and it's param
@@ -146,11 +172,21 @@ public abstract class ModelLoader {
 		}
 
 		@Override
-		protected TypeModel load(ModelLoader loader, String cl, TypeModel[] params) {
+		protected TypeModel load(ModelLoader loader, PackageModel parent, String cl, TypeModel[] params) {
 			for (int i = 0; i < loaders.length; i++) {
-				TypeModel t = loaders[i].load(loader, cl, params);
+				TypeModel t = loaders[i].load(loader, parent, cl, params);
 				if (t != null)
 					return t;
+			}
+			return null;
+		}
+
+		@Override
+		protected PackageModel loadPackage(ModelLoader loader, String name) {
+			for (int i = 0; i < loaders.length; i++) {
+				PackageModel p = loaders[i].loadPackage(loader, name);
+				if (p != null)
+					return p;
 			}
 			return null;
 		}

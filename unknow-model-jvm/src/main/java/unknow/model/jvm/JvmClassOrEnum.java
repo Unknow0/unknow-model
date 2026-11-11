@@ -58,8 +58,11 @@ public class JvmClassOrEnum extends AbstractEnumModel implements ClassModel, Jvm
 
 	@Override
 	protected ClassModel loadSuperType(ModelLoader loader) {
-		if (cl.getGenericSuperclass() == null)
-			return null;
+		if (cl.getGenericSuperclass() == null) {
+			if ("java.lang.Object".equals(cl.getName()))
+				return this;
+			throw new IllegalStateException("Invalid class " + cl);
+		}
 		return loader.get(cl.getGenericSuperclass().getTypeName(), parameters()).asClass();
 	}
 

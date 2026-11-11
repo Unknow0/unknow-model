@@ -3,8 +3,6 @@ package unknow.model.ast;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
 import org.slf4j.Logger;
@@ -23,7 +21,6 @@ import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeS
 import unknow.model.api.ModelLoader;
 import unknow.model.api.PackageModel;
 import unknow.model.api.TypeModel;
-import unknow.model.api.impl.AbstractPackageModel.EmptyPackageModel;
 
 /**
  * @author unknow
@@ -33,7 +30,6 @@ public class AstModelLoader extends ModelLoader {
 
 	private final JavaParser parser;
 	private final Path[] srcs;
-	private final Map<String, PackageModel> packages;
 
 	/**
 	 * create new AstModelLoader
@@ -53,7 +49,6 @@ public class AstModelLoader extends ModelLoader {
 	public AstModelLoader(JavaParser parser, Path... srcs) {
 		this.parser = parser == null ? createParser() : parser;
 		this.srcs = srcs;
-		this.packages = new HashMap<>();
 	}
 
 	private static final JavaParser createParser() {
@@ -63,32 +58,22 @@ public class AstModelLoader extends ModelLoader {
 	}
 
 	@Override
-	protected TypeModel load(ModelLoader loader, String cl, TypeModel[] params) {
+	protected PackageModel loadPackage(ModelLoader loader, String name) {
+		String f = name.isEmpty() ? "package-info.java" : name.replace('.', '/') + "/package-info.java";
+		return load(f).flatMap(cu -> cu.getPackageDeclaration()).map(p -> new AstPackage(loader, p)).orElse(null);
+	}
+
+	@Override
+	protected TypeModel load(ModelLoader loader, PackageModel parent, String cl, TypeModel[] params) {
 		TypeDeclaration<?> t = getType(cl);
 		if (t == null)
 			return null;
-		PackageModel p = getPackage(loader, t);
 
 		if (t.isClassOrInterfaceDeclaration() || t.isEnumDeclaration())
-			return new AstClassOrEnum<TypeDeclaration<?>>(loader, params, p, t);
+			return new AstClassOrEnum<TypeDeclaration<?>>(loader, params, parent, t);
 		if (t.isAnnotationDeclaration())
-			return new AstAnnotationDecl(loader, p, t.asAnnotationDeclaration());
+			return new AstAnnotationDecl(loader, parent, t.asAnnotationDeclaration());
 		throw new IllegalArgumentException("unsuported type " + t);
-	}
-
-	@SuppressWarnings("unchecked")
-	private PackageModel getPackage(ModelLoader loader, TypeDeclaration<?> t) {
-		String name = t.findAncestor(CompilationUnit.class).flatMap(cu -> cu.getPackageDeclaration()).map(v -> v.getNameAsString()).orElse("");
-		PackageModel decl = packages.get(name);
-		if (decl != null)
-			return decl;
-
-		String f = name.isEmpty() ? "package-info.java" : name.replace('.', '/') + "/package-info.java";
-		PackageModel pm = load(f).flatMap(cu -> cu.getPackageDeclaration()).map(p -> new AstPackage(loader, p)).orElse(null);
-		if (pm == null)
-			pm = new EmptyPackageModel(name);
-		packages.put(name, pm);
-		return pm;
 	}
 
 	private TypeDeclaration<?> getType(String cl) {

@@ -4,6 +4,7 @@
 package unknow.model.jvm;
 
 import unknow.model.api.ModelLoader;
+import unknow.model.api.PackageModel;
 import unknow.model.api.TypeModel;
 
 /**
@@ -25,11 +26,16 @@ public class JvmModelLoader extends ModelLoader {
 	}
 
 	@Override
-	protected TypeModel load(ModelLoader loader, String cl, TypeModel[] params) {
+	protected PackageModel loadPackage(ModelLoader loader, String name) {
+		Package p = cl.getDefinedPackage(name);
+		return p == null ? null : new JvmPackage(loader, p);
+	}
+
+	@Override
+	protected TypeModel load(ModelLoader loader, PackageModel parent, String cl, TypeModel[] params) {
 		Class<?> c = tryLoad(cl);
 		if (c == null)
 			return null;
-		JvmPackage parent = new JvmPackage(loader, c.getPackage());
 		if (c.isAnnotation())
 			return new JvmAnnotationDecl(this, parent, c);
 		return new JvmClassOrEnum(this, parent, c, params);

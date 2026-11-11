@@ -40,7 +40,7 @@ public abstract class AbstractClassModel extends AbstractWithAnnotation implemen
 
 	/**
 	* @param loader the model loader
-	* @return superClass binaryName
+	* @return superClass (java.lang.Object for java.lang.Object)
 	*/
 	protected abstract ClassModel loadSuperType(ModelLoader loader);
 
