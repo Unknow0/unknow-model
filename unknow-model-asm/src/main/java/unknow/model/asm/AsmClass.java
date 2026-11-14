@@ -1,14 +1,10 @@
 package unknow.model.asm;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.signature.SignatureReader;
-import org.objectweb.asm.signature.SignatureVisitor;
 import org.objectweb.asm.tree.ClassNode;
 
 import unknow.model.api.AnnotationModel;
@@ -58,8 +54,7 @@ public class AsmClass extends AbstractClassModel implements ClassModel, AsmAcces
 
 	@Override
 	protected Collection<FieldModel> loadFields(ModelLoader loader) {
-		clazz.fields.stream().map(f -> new AsmField(loader, this, f));
-		return null;
+		return clazz.fields.stream().map(f -> new AsmField(loader, this, f)).collect(Collectors.toList());
 	}
 
 	@Override
@@ -74,48 +69,6 @@ public class AsmClass extends AbstractClassModel implements ClassModel, AsmAcces
 
 	@Override
 	protected List<TypeParamModel> loadParameters(ModelLoader loader, TypeModel[] paramsClass) {
-		if (clazz.signature == null)
-			return Collections.emptyList();
-		SignatureReader reader = new SignatureReader(clazz.signature);
-		return null;
-	}
-
-	private static class ParamReader extends SignatureVisitor {
-		private final List<TypeParamModel> list;
-
-		private String currentName;
-		private List<String> currentBounds;
-
-		protected ParamReader() {
-			super(Opcodes.ASM9);
-			this.list = new ArrayList<>();
-		}
-
-		public static List<TypeParamModel> parse(String signature) {
-			if (signature == null)
-				return Collections.emptyList();
-			ParamReader r = new ParamReader();
-			new SignatureReader(signature).accept(r);
-			return r.list;
-		}
-
-		@Override
-		public void visitFormalTypeParameter(String name) {
-			flush();
-			currentName = name;
-			currentBounds = new ArrayList<>();
-		}
-
-		@Override
-		public SignatureVisitor visitSuperclass() {
-			flush();
-			return this;
-		}
-
-		private void flush() {
-			if (currentName != null) {
-//                list.add(new TypeParam(currentName, currentBounds));
-			}
-		}
+		return AsmSignatureReader.parse(loader, this, paramsClass, clazz.signature);
 	}
 }

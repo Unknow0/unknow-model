@@ -25,7 +25,7 @@ public class AsmModelLoader extends ModelLoader {
 	@Override
 	protected PackageModel loadPackage(ModelLoader loader, String name) {
 		ClassNode node = new ClassNode();
-		try (InputStream is = classLoader.getResourceAsStream(name.replace('.', '/') + "package-info.class")) {
+		try (InputStream is = classLoader.getResourceAsStream(name.replace('.', '/') + "/package-info.class")) {
 			if (is == null)
 				return null;
 			new ClassReader(is).accept(node, 0);

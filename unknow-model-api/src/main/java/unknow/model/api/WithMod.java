@@ -23,6 +23,10 @@ public interface WithMod {
 	/** @return true is it's private */
 	boolean isPrivate();
 
+	default boolean isPackagePrivate() {
+		return !isPublic() && !isProtected() && !isPrivate();
+	}
+
 	/** @return true is it's abstract */
 	boolean isAbstract();
 }

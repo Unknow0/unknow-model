@@ -81,14 +81,14 @@ public interface TypeModel extends WithAnnotation, WithName, WithParent<PackageM
 	}
 
 	/**
-	* @return true if it's a class type
+	* @return true if it's an annotation declaration
 	*/
 	default boolean isAnnotationDecl() {
 		return this instanceof AnnotationDeclModel;
 	}
 
 	/**
-	 * @return this as a class
+	 * @return this as annotation declaration
 	 */
 	default AnnotationDeclModel asAnnotationDecl() {
 		if (this instanceof AnnotationDeclModel)

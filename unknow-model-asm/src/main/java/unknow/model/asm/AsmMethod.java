@@ -35,7 +35,7 @@ public class AsmMethod extends AbstractMethodModel implements AsmAccess {
 		List<ParamModel> list = new ArrayList<>(paramTypes.length);
 		for (int i = 0; i < paramTypes.length; i++)
 			list.add(new AsmParam(loader, this, i, m));
-		return null;
+		return list;
 	}
 
 	@Override
