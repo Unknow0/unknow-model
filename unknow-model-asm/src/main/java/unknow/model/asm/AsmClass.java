@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.ClassNode;
+import org.objectweb.asm.tree.InnerClassNode;
 
 import unknow.model.api.AnnotationModel;
 import unknow.model.api.ClassModel;
@@ -32,7 +33,7 @@ public class AsmClass extends AbstractClassModel implements ClassModel, AsmAcces
 
 	@Override
 	public int access() {
-		return clazz.access;
+		return access(clazz);
 	}
 
 	@Override
@@ -70,5 +71,13 @@ public class AsmClass extends AbstractClassModel implements ClassModel, AsmAcces
 	@Override
 	protected List<TypeParamModel> loadParameters(ModelLoader loader, TypeModel[] paramsClass) {
 		return AsmSignatureReader.parse(loader, this, paramsClass, clazz.signature);
+	}
+
+	static int access(ClassNode clazz) {
+		for (InnerClassNode inner : clazz.innerClasses) {
+			if (clazz.name.equals(inner.name))
+				return inner.access;
+		}
+		return clazz.access;
 	}
 }

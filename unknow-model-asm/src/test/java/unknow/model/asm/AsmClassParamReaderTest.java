@@ -16,7 +16,7 @@ import unknow.model.api.TypeModel;
 import unknow.model.api.TypeParamModel;
 
 class AsmClassParamReaderTest {
-	static Stream<Arguments> test() {
+	static Stream<Arguments> parse() {
 		T t1 = new T();
 		T t2 = new T();
 		AsmTypeParam k = new AsmTypeParam(null, null, t1, "K", List.of("java.lang.Object"));
@@ -43,7 +43,7 @@ class AsmClassParamReaderTest {
 
 	@ParameterizedTest
 	@MethodSource
-	void test(List<AsmTypeParam> expected, TypeModel[] params, String sig) {
+	void parse(List<AsmTypeParam> expected, TypeModel[] params, String sig) {
 		List<TypeParamModel> list = AsmSignatureReader.parse(null, null, params, sig);
 		assertEquals(expected.size(), list.size());
 		for (int i = 0; i < expected.size(); i++) {
@@ -53,6 +53,17 @@ class AsmClassParamReaderTest {
 			assertEquals(e.bounds, l.bounds);
 			assertEquals(e.type(), l.type());
 		}
+	}
+
+	static Stream<Arguments> parseType() {
+		return Stream.of(Arguments.of("T", "TT;"), Arguments.of("T[]", "[TT;"), Arguments.of("String", "LString;"), Arguments.of("int", "I"),
+				Arguments.of("java.util.List<java.lang.String>", "Ljava/util/List<Ljava/lang/String;>;"));
+	}
+
+	@ParameterizedTest
+	@MethodSource
+	void parseType(String expected, String sig) {
+		assertEquals(expected, AsmSignatureReader.parseType(sig));
 	}
 
 	static class T implements TypeModel {

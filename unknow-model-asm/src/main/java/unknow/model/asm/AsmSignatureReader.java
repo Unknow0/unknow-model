@@ -42,9 +42,16 @@ public class AsmSignatureReader extends SignatureVisitor {
 		return r.list;
 	}
 
+	public static String parseType(String signature) {
+		if (signature == null)
+			return null;
+		StringBuilder result = new StringBuilder();
+		new SignatureReader(signature).acceptType(new TypeReader(result::append));
+		return result.toString();
+	}
+
 	@Override
 	public void visitFormalTypeParameter(String name) {
-		System.out.println("visitFormalTypeParameter " + name);
 		flush();
 		currentName = name;
 		currentBounds = new ArrayList<>();
@@ -52,14 +59,12 @@ public class AsmSignatureReader extends SignatureVisitor {
 
 	@Override
 	public SignatureVisitor visitClassBound() {
-		System.out.println("visitClassBound");
-		return new BoundReader(s -> currentBounds.add(s.toString()));
+		return new TypeReader(s -> currentBounds.add(s.toString()));
 	}
 
 	@Override
 	public SignatureVisitor visitInterfaceBound() {
-		System.out.println("visitInterfaceBound");
-		return new BoundReader(s -> currentBounds.add(s.toString()));
+		return new TypeReader(s -> currentBounds.add(s.toString()));
 	}
 
 	private void flush() {
@@ -73,14 +78,13 @@ public class AsmSignatureReader extends SignatureVisitor {
 		}
 	}
 
-	private static class BoundReader extends SignatureVisitor {
-
+	private static class TypeReader extends SignatureVisitor {
 		private final Consumer<StringBuilder> c;
 		private final StringBuilder sb;
 		private BitSet hasArg;
 		private int i = 0;
 
-		protected BoundReader(Consumer<StringBuilder> c) {
+		protected TypeReader(Consumer<StringBuilder> c) {
 			super(Opcodes.ASM9);
 			this.c = c;
 			this.sb = new StringBuilder();
@@ -113,24 +117,64 @@ public class AsmSignatureReader extends SignatureVisitor {
 			}
 		}
 
+		private void flush() {
+			if (i == 0) {
+				c.accept(sb);
+				sb.setLength(0);
+			}
+		}
+
 		@Override
 		public void visitClassType(String name) {
 			i++;
-			System.out.println("  visitClassType " + name);
 			append(name);
 		}
 
 		@Override
 		public void visitInnerClassType(String name) {
-			System.out.println("  visitInnerClassType " + name);
 			closeArg();
 			sb.append('$');
 			append(name);
 		}
 
 		@Override
+		public void visitBaseType(char type) {
+			switch (type) {
+				case 'Z':
+					sb.append("boolean");
+					break;
+				case 'B':
+					sb.append("byte");
+					break;
+				case 'C':
+					sb.append("char");
+					break;
+				case 'S':
+					sb.append("short");
+					break;
+				case 'I':
+					sb.append("int");
+					break;
+				case 'J':
+					sb.append("long");
+					break;
+				case 'F':
+					sb.append("float");
+					break;
+				case 'D':
+					sb.append("double");
+					break;
+				case 'V':
+					sb.append("void");
+					break;
+				default:
+					throw new IllegalArgumentException("Unknown base type: " + type);
+			}
+			flush();
+		}
+
+		@Override
 		public SignatureVisitor visitTypeArgument(char wildcard) {
-			System.out.println("  visitTypeArgument " + wildcard);
 			startArg();
 
 			if (wildcard == '+')
@@ -142,29 +186,29 @@ public class AsmSignatureReader extends SignatureVisitor {
 
 		@Override
 		public void visitTypeVariable(String name) {
-			System.out.println("  visitTypeVariable " + name);
 			sb.append(name);
+			flush();
 		}
 
 		@Override
 		public void visitTypeArgument() {
-			System.out.println("  visitTypeArgument");
 			startArg();
 			sb.append('?');
 		}
 
 		@Override
 		public SignatureVisitor visitArrayType() {
-			System.out.println("  visitArrayType");
-			return new BoundReader(s -> sb.append(s.append("[]")));
+			return new TypeReader(s -> {
+				sb.append(s).append("[]");
+				flush();
+			});
 		}
 
 		@Override
 		public void visitEnd() {
-			System.out.println("  visitEnd");
 			closeArg();
-			if (--i == 0)
-				c.accept(sb);
+			i--;
+			flush();
 		}
 	}
 }

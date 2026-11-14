@@ -40,7 +40,7 @@ public class PrimitiveModel implements TypeModel {
 	public static final List<PrimitiveModel> PRIMITIVES = Arrays.asList(VOID, BOOLEAN, BYTE, CHAR, SHORT, INT, LONG, FLOAT, DOUBLE);
 
 	private final String name;
-	private final String binary;
+	final String binary;
 	private final String boxed;
 
 	private PrimitiveModel(String name, String binary, String boxed) {
@@ -51,7 +51,7 @@ public class PrimitiveModel implements TypeModel {
 
 	@Override
 	public String name() {
-		return binary;
+		return name;
 	}
 
 	@Override

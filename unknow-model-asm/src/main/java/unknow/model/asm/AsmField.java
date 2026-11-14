@@ -39,7 +39,10 @@ public class AsmField extends AbstractFieldModel implements AsmAccess {
 
 	@Override
 	protected TypeModel loadType(ModelLoader loader) {
-		return loader.get(Type.getType(f.desc).getClassName());
+		String name = AsmSignatureReader.parseType(f.signature);
+		if (name == null)
+			name = Type.getType(f.desc).getClassName();
+		return loader.get(name);
 	}
 
 	@Override

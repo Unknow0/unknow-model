@@ -93,7 +93,7 @@ public interface TypeModel extends WithAnnotation, WithName, WithParent<PackageM
 	default AnnotationDeclModel asAnnotationDecl() {
 		if (this instanceof AnnotationDeclModel)
 			return (AnnotationDeclModel) this;
-		throw new IllegalStateException(name() + " isn't an annotation declaration");
+		throw new IllegalStateException(getClass().getName() + " " + name() + " isn't an annotation declaration");
 	}
 
 	default void ifAnnotationDecl(Consumer<AnnotationDeclModel> c) {

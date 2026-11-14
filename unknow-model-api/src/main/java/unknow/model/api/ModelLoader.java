@@ -24,7 +24,7 @@ public abstract class ModelLoader {
 
 	static {
 		for (PrimitiveModel t : PrimitiveModel.PRIMITIVES) {
-			BUILDIN.put(t.simpleName(), t);
+			BUILDIN.put(t.binary, t);
 			BUILDIN.put(t.name(), t);
 		}
 	}

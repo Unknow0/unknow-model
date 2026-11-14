@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.ClassNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,6 +44,9 @@ public class AsmModelLoader extends ModelLoader {
 			if (is == null)
 				return null;
 			new ClassReader(is).accept(node, ClassReader.SKIP_CODE | ClassReader.SKIP_DEBUG | ClassReader.SKIP_FRAMES);
+			if ((node.access & Opcodes.ACC_ANNOTATION) != 0)
+				return new AsmAnnotationDecl(loader, parent, node);
+
 			return new AsmClass(loader, parent, node, params);
 		} catch (IOException e) {
 			logger.warn("Failed to parse class {}", cl, e);
