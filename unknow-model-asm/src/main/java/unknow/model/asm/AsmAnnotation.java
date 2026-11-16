@@ -39,7 +39,10 @@ public class AsmAnnotation extends AbstractAnnotationModel {
 		return members;
 	}
 
-	private static AnnotationValue value(ModelLoader loader, Object v) {
+	static AnnotationValue value(ModelLoader loader, Object v) {
+		if (v == null)
+			return AnnotationValue.NULL;
+
 		if (v instanceof Type) {
 			Type type = (Type) v;
 			return new AnnotationValueClass(loader.get(type.getClassName()));

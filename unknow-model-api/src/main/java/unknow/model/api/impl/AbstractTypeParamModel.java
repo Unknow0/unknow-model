@@ -1,5 +1,6 @@
 package unknow.model.api.impl;
 
+import java.util.Iterator;
 import java.util.List;
 
 import unknow.model.api.ClassModel;
@@ -27,6 +28,19 @@ public abstract class AbstractTypeParamModel extends AbstractWithAnnotation impl
 	@Override
 	public final ClassModel parent() {
 		return c;
+	}
+
+	@Override
+	public String genericName() {
+		if (type != null)
+			return type.genericName();
+		if (bounds().isEmpty())
+			return name();
+		Iterator<ClassModel> it = bounds().iterator();
+		StringBuilder sb = new StringBuilder(name()).append(" extends ").append(it.next().genericName());
+		while (it.hasNext())
+			sb.append('&').append(it.next().genericName());
+		return sb.toString();
 	}
 
 	@Override

@@ -36,12 +36,11 @@ public class AsmParam extends AbstractParamModel {
 	@Override
 	protected List<AnnotationModel> loadAnnotations(ModelLoader loader) {
 		int i = index();
+		int total = parent().parameters().size();
 		if (m.invisibleAnnotableParameterCount != 0)
-			i = i + m.invisibleAnnotableParameterCount - m.parameters.size();
+			i = i + m.invisibleAnnotableParameterCount - total;
 		if (i < 0)
 			return Collections.emptyList();
-		int total = m.parameters.size();
-		;
 		List<AnnotationNode> invisible = annotations(m.invisibleParameterAnnotations, m.invisibleAnnotableParameterCount, index(), total);
 		List<AnnotationNode> visible = annotations(m.visibleParameterAnnotations, m.visibleAnnotableParameterCount, index(), total);
 		return AsmAnnotation.from(loader, invisible, visible);

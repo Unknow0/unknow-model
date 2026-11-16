@@ -13,4 +13,6 @@ public interface TypeParamModel extends WithAnnotation, WithType, WithName, With
 	 * @return parameter bounds
 	 */
 	List<ClassModel> bounds();
+
+	String genericName();
 }

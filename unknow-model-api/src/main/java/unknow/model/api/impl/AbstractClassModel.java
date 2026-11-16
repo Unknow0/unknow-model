@@ -91,7 +91,7 @@ public abstract class AbstractClassModel extends AbstractWithAnnotation implemen
 			return name();
 		StringBuilder sb = new StringBuilder(name()).append('<');
 		for (TypeParamModel t : parameters())
-			sb.append(t.type().genericName()).append(',');
+			sb.append(t.genericName()).append(',');
 		sb.setCharAt(sb.length() - 1, '>');
 		return sb.toString();
 	}
@@ -102,7 +102,7 @@ public abstract class AbstractClassModel extends AbstractWithAnnotation implemen
 			return null;
 		if (superType == null)
 			superType = loadSuperType(loader);
-		return superType;
+		return superType == this ? null : superType;
 	}
 
 	@Override

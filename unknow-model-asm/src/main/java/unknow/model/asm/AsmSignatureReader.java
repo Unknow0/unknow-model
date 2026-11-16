@@ -19,7 +19,9 @@ public class AsmSignatureReader extends SignatureVisitor {
 	private final ModelLoader loader;
 	private final ClassModel parent;
 	private final TypeModel[] paramsClass;
-	private final List<TypeParamModel> list;
+	public final List<TypeParamModel> params;
+	public String superClass;
+	public final List<String> interfaces;
 
 	private String currentName;
 	private List<String> currentBounds;
@@ -30,16 +32,17 @@ public class AsmSignatureReader extends SignatureVisitor {
 		this.loader = loader;
 		this.parent = parent;
 		this.paramsClass = paramsClass;
-		this.list = new ArrayList<>();
+		this.params = new ArrayList<>();
+		this.interfaces = new ArrayList<>();
 	}
 
-	public static List<TypeParamModel> parse(ModelLoader loader, ClassModel parent, TypeModel[] paramsClass, String signature) {
+	public static AsmSignatureReader parse(ModelLoader loader, ClassModel parent, TypeModel[] paramsClass, String signature) {
 		if (signature == null)
-			return Collections.emptyList();
+			return null;
 		AsmSignatureReader r = new AsmSignatureReader(loader, parent, paramsClass);
 		new SignatureReader(signature).accept(r);
 		r.flush();
-		return r.list;
+		return r;
 	}
 
 	public static String parseType(String signature) {
@@ -48,6 +51,16 @@ public class AsmSignatureReader extends SignatureVisitor {
 		StringBuilder result = new StringBuilder();
 		new SignatureReader(signature).acceptType(new TypeReader(result::append));
 		return result.toString();
+	}
+
+	@Override
+	public SignatureVisitor visitSuperclass() {
+		return new TypeReader(s -> superClass = s.toString());
+	}
+
+	@Override
+	public SignatureVisitor visitInterface() {
+		return new TypeReader(s -> interfaces.add(s.toString()));
 	}
 
 	@Override
@@ -72,7 +85,7 @@ public class AsmSignatureReader extends SignatureVisitor {
 			TypeModel t = null;
 			if (i < paramsClass.length)
 				t = paramsClass[i++];
-			list.add(new AsmTypeParam(loader, parent, t, currentName, currentBounds));
+			params.add(new AsmTypeParam(loader, parent, t, currentName, currentBounds));
 			currentName = null;
 			currentBounds = null;
 		}

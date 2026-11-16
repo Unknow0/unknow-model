@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.beans.JavaBean;
 import java.beans.Transient;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -86,7 +87,7 @@ public class AsmClassTest {
 			return null;
 		}
 
-		static void compute(String s) { //ok
+		static void compute(String s) { //
 		}
 	}
 
@@ -129,7 +130,60 @@ public class AsmClassTest {
 		assertTrue(m.isPresent());
 		assertTrue(m.get().isPackagePrivate());
 		assertTrue(m.get().isStatic());
-		assertEquals("void", m.get().type().toString());
+		assertEquals("void", m.get().type().name());
+		assertEquals(1, cl.constructors().size());
+		MethodModel c = cl.constructors().iterator().next();
+		assertTrue(c.isPackagePrivate());
+		assertEquals(1, c.parameters().size());
+		assertEquals("int", c.parameter(0).type().name());
+	}
+
+	private static abstract class Generic<T extends Number> extends ArrayList<T> implements List<T> {
+		private static final long serialVersionUID = 1L;
+
+		public T doStuff() {
+			return null;
+		}
+
+		static List<String> compute(List<String> s) {
+			return s;
+		}
+	}
+
+	@Test
+	void generic() {
+		AsmModelLoader loader = new AsmModelLoader(AsmClassTest.class.getClassLoader());
+		TypeModel t = loader.load(loader, null, Generic.class.getName(), new TypeModel[0]);
+		assertTrue(t.isClass());
+		ClassModel cl = t.asClass();
+		assertTrue(cl.isPrivate());
+		assertFalse(cl.isInterface());
+		assertTrue(cl.isAbstract());
+		assertEquals(Generic.class.getName() + "<T extends java.lang.Number>", cl.genericName());
+		assertEquals(Generic.class.getName(), cl.name());
+		assertEquals(ArrayList.class.getName(), cl.superType().name());
+		assertEquals(1, cl.interfaces().size());
+		assertEquals(List.class.getName() + "<T extends Number>", cl.interfaces().iterator().next().genericName());
+		assertTrue(cl.annotations().isEmpty());
+		assertEquals(2, cl.fields().size());
+
+		Optional<FieldModel> f = cl.field("field1");
+		assertTrue(f.isPresent());
+		assertEquals("int", f.get().type().name());
+		f = cl.field("list");
+		assertTrue(f.isPresent());
+		assertClass(f.get().type().asClass(), "java.util.List", "java.lang.String");
+
+		assertEquals(2, cl.methods().size());
+		Optional<MethodModel> m = cl.method("doStuff");
+		assertTrue(m.isPresent());
+		assertTrue(m.get().isPublic());
+		assertEquals("java.lang.Object", m.get().type().name());
+		m = cl.method("compute", loader.get("java.util.List<java.lang.String>"));
+		assertTrue(m.isPresent());
+		assertTrue(m.get().isPackagePrivate());
+		assertTrue(m.get().isStatic());
+		assertEquals("java.util.List<java.lang.String>", m.get().type().toString());
 		assertEquals(1, cl.constructors().size());
 		MethodModel c = cl.constructors().iterator().next();
 		assertTrue(c.isPackagePrivate());

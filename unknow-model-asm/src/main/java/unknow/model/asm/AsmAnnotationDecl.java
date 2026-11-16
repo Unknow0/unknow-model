@@ -47,7 +47,7 @@ public class AsmAnnotationDecl extends AbstractAnnotationDeclModel implements As
 
 		@Override
 		protected AnnotationValue loadValue(ModelLoader loader) {
-			return null;
+			return AsmAnnotation.value(loader, m.annotationDefault);
 		}
 
 		@Override

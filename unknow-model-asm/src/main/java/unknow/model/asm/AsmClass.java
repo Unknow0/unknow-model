@@ -1,6 +1,7 @@
 package unknow.model.asm;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -20,10 +21,12 @@ import unknow.model.api.impl.AbstractClassModel;
 
 public class AsmClass extends AbstractClassModel implements ClassModel, AsmAccess {
 	private final ClassNode clazz;
+	private final AsmSignatureReader sig;
 
 	public AsmClass(ModelLoader loader, PackageModel parent, ClassNode clazz, TypeModel[] paramsClass) {
 		super(loader, parent, clazz.name.replace('/', '.'), paramsClass);
 		this.clazz = clazz;
+		this.sig = AsmSignatureReader.parse(loader, this, paramsClass, clazz.signature);
 	}
 
 	@Override
@@ -45,11 +48,14 @@ public class AsmClass extends AbstractClassModel implements ClassModel, AsmAcces
 	protected ClassModel loadSuperType(ModelLoader loader) {
 		if (clazz.superName == null)
 			return this;
-		return loader.get(clazz.superName.replace('/', '.')).asClass();
+		String n = sig != null ? sig.superClass : clazz.superName.replace('/', '.');
+		return loader.get(n, parameters()).asClass();
 	}
 
 	@Override
 	protected List<ClassModel> loadInterfaces(ModelLoader loader) {
+		if (sig != null)
+			return sig.interfaces.stream().map(n -> loader.get(n, parameters()).asClass()).collect(Collectors.toList());
 		return clazz.interfaces.stream().map(t -> loader.get(t.replace('/', '.')).asClass()).collect(Collectors.toList());
 	}
 
@@ -70,7 +76,7 @@ public class AsmClass extends AbstractClassModel implements ClassModel, AsmAcces
 
 	@Override
 	protected List<TypeParamModel> loadParameters(ModelLoader loader, TypeModel[] paramsClass) {
-		return AsmSignatureReader.parse(loader, this, paramsClass, clazz.signature);
+		return sig == null ? Collections.emptyList() : sig.params;
 	}
 
 	static int access(ClassNode clazz) {
